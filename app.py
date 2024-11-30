@@ -6,7 +6,7 @@ from ultralytics import YOLO
 app = Flask(__name__)
 
 # YOLO 모델 로드
-model = YOLO(r'Service Design Prototyping\project\web_demo\yolo_pt\yolo11x.pt')  # YOLOv8 모델
+model = YOLO(r'yolo11x.pt')  # YOLOv8 모델
 
 # 웹캠 캡처
 cap = cv2.VideoCapture(1)
