@@ -31,9 +31,13 @@ def process_frames():
         results = model(frame)
         detections = []
 
+        # 사람 수
+        people_count = 0
+
         # 탐지 결과에서 사람만 필터링
         for result in results[0].boxes:
             if result.cls == 0:  # 사람 클래스 (YOLO 기준 0)
+                people_count += 1
                 x1, y1, x2, y2 = map(int, result.xyxy[0])
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
@@ -68,8 +72,10 @@ def process_frames():
         most_movement_count = current_direction_counts[most_movement_direction]
 
         # 방향 결과 표시
-        result_text = f"Most movement: {most_movement_direction} ({most_movement_count})"
-        cv2.putText(frame, result_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        result_text_1 = f"People: {people_count}"
+        result_text_2 = f"Most movement: {most_movement_direction} ({most_movement_count})"
+        cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        cv2.putText(frame, result_text_2, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
