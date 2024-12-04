@@ -8,6 +8,8 @@ from norfair import Detection, Tracker
 # 이전 위치 저장
 previous_positions = {}
 
+complex_ratio = [0.3, 0.7]
+
 def calculate_direction(prev_pos, curr_pos):
     """두 점을 비교하여 이동 방향을 계산합니다."""
     dx = curr_pos[0] - prev_pos[0]
@@ -83,6 +85,7 @@ def process_frames():
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
 def process_area_frames():
+    global complex_ratio
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -103,8 +106,15 @@ def process_area_frames():
 
         # 면적 비율 계산
         area_ratio = (total_person_area / frame_area) * 100
-        cv2.putText(frame, f"Person Area Ratio: {area_ratio:.2f}%", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        if area_ratio < complex_ratio[0]:
+            cv2.putText(frame, f"Person Area Ratio: 여유", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
+            cv2.putText(frame, f"Person Area Ratio: 보통", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        else:
+            cv2.putText(frame, f"Person Area Ratio: 혼잡", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
