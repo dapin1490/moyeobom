@@ -3,23 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>People Counter</title>
+    <title>People Counter and Area Ratio</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 20px;
         }
-        video {
+        .video-feed {
             border: 2px solid #000;
             max-width: 100%;
             height: auto;
+            margin: 20px auto;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .nav a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <h1>People Counter and Tracker</h1>
-    <!-- <video id="video-stream" autoplay></video> -->
-    <img id="live-feed" src="/video_feed" alt="Live feed" style="width: 100%; max-width: 800px; height: auto; border: 2px solid #000;">
+    <div class="nav">
+        <a href="/">People Counter</a>
+        <a href="/area_feed" target='_blank'>Person Area Ratio</a>
+    </div>
+    <img id="live-feed" class="video-feed" src="/video_feed" alt="Live feed">
 </body>
 </html>

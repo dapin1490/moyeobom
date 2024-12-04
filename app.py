@@ -5,7 +5,6 @@ from flask import Flask, render_template, Response
 from ultralytics import YOLO
 from norfair import Detection, Tracker
 
-
 # 이전 위치 저장
 previous_positions = {}
 
@@ -74,8 +73,8 @@ def process_frames():
         # 방향 결과 표시
         result_text_1 = f"People: {people_count}"
         result_text_2 = f"Most movement: {most_movement_direction} ({most_movement_count})"
-        cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-        cv2.putText(frame, result_text_2, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        cv2.putText(frame, result_text_2, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
@@ -83,6 +82,35 @@ def process_frames():
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
+def process_area_frames():
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Error: Unable to read from webcam.")
+            break
+
+        frame_area = frame.shape[0] * frame.shape[1]
+        total_person_area = 0
+
+        # YOLO 탐지
+        results = model(frame)
+
+        for result in results[0].boxes:
+            if result.cls == 0:  # 사람 클래스
+                x1, y1, x2, y2 = map(int, result.xyxy[0])
+                person_area = (x2 - x1) * (y2 - y1)
+                total_person_area += person_area
+
+        # 면적 비율 계산
+        area_ratio = (total_person_area / frame_area) * 100
+        cv2.putText(frame, f"Person Area Ratio: {area_ratio:.2f}%", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+
+        # 프레임을 JPEG로 인코딩
+        _, buffer = cv2.imencode(".jpg", frame)
+        frame_bytes = buffer.tobytes()
+        yield (b"--frame\r\n"
+               b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
 app = Flask(__name__)
 
@@ -102,6 +130,10 @@ def index():
 @app.route("/video_feed")
 def video_feed():
     return Response(process_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route("/area_feed")
+def area_feed():
+    return Response(process_area_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
