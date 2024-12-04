@@ -1,14 +1,17 @@
 import torch
 import cv2
 import numpy as np
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
 from ultralytics import YOLO
 from norfair import Detection, Tracker
 
 # 이전 위치 저장
 previous_positions = {}
 
-complex_ratio = [0.3, 0.7]
+complex_ratio = [30, 70]
+
+message_count = ""
+message_ratio = ""
 
 def calculate_direction(prev_pos, curr_pos):
     """두 점을 비교하여 이동 방향을 계산합니다."""
@@ -20,7 +23,7 @@ def calculate_direction(prev_pos, curr_pos):
         return "down" if dy > 0 else "up"
 
 def process_frames():
-    global previous_positions
+    global previous_positions, message_count
 
     while True:
         ret, frame = cap.read()
@@ -73,10 +76,11 @@ def process_frames():
         most_movement_count = current_direction_counts[most_movement_direction]
 
         # 방향 결과 표시
-        result_text_1 = f"People: {people_count}"
-        result_text_2 = f"Most movement: {most_movement_direction} ({most_movement_count})"
-        cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
-        cv2.putText(frame, result_text_2, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        # result_text_1 = f"People: {people_count}"
+        # result_text_2 = f"Most movement: {most_movement_direction} ({most_movement_count})"
+        # cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        # cv2.putText(frame, result_text_2, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        message_count = f"People: {people_count}\nMost movement: {most_movement_direction} ({most_movement_count})"
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
@@ -85,7 +89,7 @@ def process_frames():
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
 def process_area_frames():
-    global complex_ratio
+    global complex_ratio, message_ratio
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -106,15 +110,19 @@ def process_area_frames():
 
         # 면적 비율 계산
         area_ratio = (total_person_area / frame_area) * 100
+        message_ratio = f"Person Area Ratio: "
         if area_ratio < complex_ratio[0]:
-            cv2.putText(frame, f"Person Area Ratio: 여유", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            # cv2.putText(frame, f"Person Area Ratio: 여유", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            message_ratio += "여유"
         elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
-            cv2.putText(frame, f"Person Area Ratio: 보통", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            # cv2.putText(frame, f"Person Area Ratio: 보통", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            message_ratio += "보통"
         else:
-            cv2.putText(frame, f"Person Area Ratio: 혼잡", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            # cv2.putText(frame, f"Person Area Ratio: 혼잡", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            message_ratio += "혼잡"
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
@@ -137,6 +145,14 @@ cap = cv2.VideoCapture(0)
 def index():
     return render_template("index.html")
 
+@app.route("/count_view")
+def count_view():
+    return render_template("count_view.html")
+
+@app.route("/area_view")
+def area_view():
+    return render_template("area_view.html")
+
 @app.route("/video_feed")
 def video_feed():
     return Response(process_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -144,6 +160,22 @@ def video_feed():
 @app.route("/area_feed")
 def area_feed():
     return Response(process_area_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route("/get_count_data")
+def get_count_data():
+    global message_count
+    text_data = {
+        "message": f"{message_count}"
+    }
+    return jsonify(text_data)
+
+@app.route("/get_ratio_data")
+def get_ratio_data():
+    global message_ratio
+    text_data = {
+        "message": f"{message_ratio}"
+    }
+    return jsonify(text_data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
