@@ -76,10 +76,6 @@ def process_frames():
         most_movement_count = current_direction_counts[most_movement_direction]
 
         # 방향 결과 표시
-        # result_text_1 = f"People: {people_count}"
-        # result_text_2 = f"Most movement: {most_movement_direction} ({most_movement_count})"
-        # cv2.putText(frame, result_text_1, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
-        # cv2.putText(frame, result_text_2, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
         message_count = f"People: {people_count}\nMost movement: {most_movement_direction} ({most_movement_count})"
 
         # 프레임을 JPEG로 인코딩
@@ -112,16 +108,10 @@ def process_area_frames():
         area_ratio = (total_person_area / frame_area) * 100
         message_ratio = f"Person Area Ratio: "
         if area_ratio < complex_ratio[0]:
-            # cv2.putText(frame, f"Person Area Ratio: 여유", (10, 30),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
             message_ratio += "여유"
         elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
-            # cv2.putText(frame, f"Person Area Ratio: 보통", (10, 30),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
             message_ratio += "보통"
         else:
-            # cv2.putText(frame, f"Person Area Ratio: 혼잡", (10, 30),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
             message_ratio += "혼잡"
 
         # 프레임을 JPEG로 인코딩
