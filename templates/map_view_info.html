@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Pretendard&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+    <title>map view info</title>
+    <style> /* progress bar style */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background-color: #28a745; /* 기본 녹색 */
+            width: 2%; /* 초기 너비 */
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: black;
+        }
+
+        .progress-text {
+            width: 40px;
+            text-align: center;
+            color: #aaa; /* 텍스트 색상 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="v659_900">
+        <div class="v659_2132">
+            <div class="v659_901"></div>
+            <div class="v659_2128">
+                <div class="v659_902"></div>
+                <div class="v659_903"></div><span class="v659_914">TIME TABLE</span>
+                <div class="v659_930"><span class="v659_931">21:40 - 23:00(80min)</span><span
+                        class="v659_932">NELL</span></div>
+                <div class="v659_927"><span class="v659_928">19:30 - 20:30(60min)</span><span class="v659_929">TAHITI
+                        80</span></div>
+                <div class="v659_924"><span class="v659_925">17:50 - 18:40(50min)</span><span class="v659_926">유라</span>
+                </div>
+                <div class="v659_918"><span class="v659_919">NOTING BUT THEIVES</span><span class="v659_920">16:30 -
+                        17:10(40min)</span></div>
+                <div class="v659_921"><span class="v659_922">15:20 - 16:00(40min)</span><span
+                        class="v659_923">이무진</span></div>
+                <div class="v659_915"><span class="v659_916">크랙샷</span><span class="v659_917">14:10 -
+                        14:50(40min)</span></div>
+            </div>
+            <div class="v659_2129">
+                <div class="v659_906">
+                    <div class="progress-container">
+                        <div class="progress-text">0%</div>
+                        <div id="ratio-output" class="progress-bar">
+                            <div id="ratio-output-inner" class="progress-bar-inner">
+                                <span id="ratio-output-label" class="progress-label">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-text">100%</div>
+                    </div>
+                </div>
+                <span class="v659_913">NOTING BUT THEIVES</span>
+                <div class="v659_933">
+                    <span class="v659_934">공연중</span>
+                    <span id="is_enter_ok" class="v659_935">입장</span>
+                </div>
+            </div>
+            <div class="v659_2130">
+                <a href="/area_feed">
+                    <div class="v659_905" style="cursor: pointer"></div>
+                    <span class="v659_936">대기 현장 보기</span>
+                </a>
+            </div>
+            <div class="v659_2131">
+                <div class="v659_904"></div><span class="v659_937">알림 받기</span>
+            </div>
+        </div>
+        <a href="/map_view">
+            <div class="v659_938" style="cursor: pointer">
+                <div class="v659_939"></div>
+            </div>
+        </a>
+        <div class="v659_940">
+            <div class="v659_941"></div><span class="v659_942">MAY FOREST</span>
+            <div class="v659_943"></div>
+        </div>
+        <div class="name"></div>
+    </div>
+    <script>
+        async function fetchRatioData() {
+            const progressBarInner = document.getElementById('ratio-output-inner');
+            const progressLabel = document.getElementById('ratio-output-label');
+            const enter_flag = document.getElementById('is_enter_ok');
+            enter_flag.textContent = "입장 가능";
+
+            // 상태와 퍼센티지 매핑
+            const statusMap = {
+                '1': 33,   // 1/3
+                '2': 66,   // 2/3
+                '3': 100   // 전체
+            };
+            const statusWord = {
+                33: '여유',
+                66: '보통',
+                100: '혼잡'
+            };
+
+            let percentage = 1;
+
+            try {
+                const response = await fetch("/get_ratio_code");
+                const data = await response.json();
+
+                if (data.error) {
+                    // document.getElementById("ratio-output-label").innerText = "Error: Unable to fetch data.";
+                    percentage = 0;
+                } else {
+                    // document.getElementById("ratio-output-label").innerText = data.message;
+                    // 전달받은 상태에 따라 퍼센티지 계산
+                    percentage = statusMap[data.message] || 3; // 상태가 없으면 3%
+                }
+            } catch (error) {
+                console.error("Error fetching ratio data:", error);
+            }
+
+            if (percentage > 66) {
+                enter_flag.textContent = "입장 불가";
+                enter_flag.style.color = "rgba(235, 64, 52, 1)";
+            } else {
+                enter_flag.textContent = "입장 가능";
+                enter_flag.style.color = "rgb(20, 209, 0)";
+            }
+
+            // 프로그레스 바와 텍스트 업데이트
+            progressBarInner.style.width = percentage + '%';
+            progressLabel.textContent = statusWord[percentage];
+            document.getElementById('ratio-info-label').textContent = statusWord[percentage];
+        }
+
+        // 주기적으로 서버에서 텍스트 데이터 가져오기
+        setInterval(fetchRatioData, 1000); // 1초마다 호출
+    </script>
+</body>
+
+</html>

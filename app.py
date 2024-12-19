@@ -12,6 +12,7 @@ complex_ratio = [30, 70]
 
 message_count = ""
 message_ratio = ""
+ratio_code = ''
 
 def calculate_direction(prev_pos, curr_pos):
     """두 점을 비교하여 이동 방향을 계산합니다."""
@@ -85,7 +86,7 @@ def process_frames():
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
 def process_area_frames():
-    global complex_ratio, message_ratio
+    global complex_ratio, message_ratio, ratio_code
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -109,10 +110,13 @@ def process_area_frames():
         message_ratio = f"Person Area Ratio: "
         if area_ratio < complex_ratio[0]:
             message_ratio += "여유"
+            ratio_code = '1'
         elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
             message_ratio += "보통"
+            ratio_code = '2'
         else:
             message_ratio += "혼잡"
+            ratio_code = '3'
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
@@ -143,6 +147,14 @@ def count_view():
 def area_view():
     return render_template("area_view.html")
 
+@app.route("/map_view")
+def map_view():
+    return render_template("map_view.html")
+
+@app.route("/map_view_info")
+def map_view_info():
+    return render_template("map_view_info.html")
+
 @app.route("/video_feed")
 def video_feed():
     return Response(process_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -164,6 +176,14 @@ def get_ratio_data():
     global message_ratio
     text_data = {
         "message": f"{message_ratio}"
+    }
+    return jsonify(text_data)
+
+@app.route("/get_ratio_code")
+def get_ratio_code():
+    global ratio_code
+    text_data = {
+        "message": f"{ratio_code}"
     }
     return jsonify(text_data)
 

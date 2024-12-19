@@ -3,8 +3,61 @@
 
 <head>
     <link href="https://fonts.googleapis.com/css?family=Pretendard&display=swap" rel="stylesheet" />
-    <link href="./css/main.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
     <title>Document</title>
+    <script>
+        function stageClick() {
+            const div = document.querySelector(".v659_1114");
+            // 현재 display 상태를 확인하고 변경
+            if (div.style.display === "none" || div.style.display === "") {
+                div.style.display = "block"; // div 보이기
+            } else {
+                div.style.display = "none"; // div 숨기기
+            }
+    }
+    </script>
+    <!-- progress bar style -->
+    <style>
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background-color: #28a745; /* 기본 녹색 */
+            width: 2%; /* 초기 너비 */
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: black;
+        }
+
+        .progress-text {
+            width: 40px;
+            text-align: center;
+            color: #aaa; /* 텍스트 색상 */
+        }
+    </style>
 </head>
 
 <body>
@@ -41,18 +94,73 @@
                 </div><span class="v659_1060">티켓부스&이벤트존</span>
             </div>
         </div>
-        <div class="v659_1114">
-            <div class="v659_1115"></div><span class="v659_1116">nothing but theives</span><span
-                class="v659_1117">공연중</span><span class="v659_1118">MAY FOREST :</span><span class="v659_1119">여유</span>
-            <div class="v659_1120">
-                <div class="v659_1121"></div>
-                <div class="v659_1122"></div>
+        <div class="v659_1114"> <!-- info popup -->
+            <div class="v659_1115"></div>
+            <span class="v659_1116">nothing but theives</span>
+            <span class="v659_1117">공연중</span>
+            <span class="v659_1118">MAY FOREST :</span>
+            <span id="ratio-info-label" class="v659_1119">여유</span>
+            <div class="v659_1120"> <!-- new tab button -->
+                <a href="/map_view_info" style="text-decoration: none;">
+                    <div class="v659_1121"></div>
+                    <div class="v659_1122"></div>
+                </a>
             </div>
-            <div class="v659_1123"><span class="v659_1124">0%</span><span class="v659_1125">38%</span><span
-                    class="v659_1126">100%</span>
-                <div class="v659_1127"></div>
-                <div class="v659_1128"></div>
-                <div class="name"></div>
+            <!-- progress bar -->
+            <div class="v659_1123">
+                <div class="progress-container">
+                    <div class="progress-text">0%</div>
+                    <div id="ratio-output" class="progress-bar">
+                        <div id="ratio-output-inner" class="progress-bar-inner">
+                            <span id="ratio-output-label" class="progress-label">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-text">100%</div>
+                </div>
+                <script>
+                    async function fetchRatioData() {
+                        const progressBarInner = document.getElementById('ratio-output-inner');
+                        const progressLabel = document.getElementById('ratio-output-label');
+
+                        // 상태와 퍼센티지 매핑
+                        const statusMap = {
+                            '1': 33,   // 1/3
+                            '2': 66,   // 2/3
+                            '3': 100   // 전체
+                        };
+                        const statusWord = {
+                            33: '여유',
+                            66: '보통',
+                            100: '혼잡'
+                        };
+
+                        let percentage = 13;
+
+                        try {
+                            const response = await fetch("/get_ratio_code");
+                            const data = await response.json();
+
+                            if (data.error) {
+                                // document.getElementById("ratio-output-label").innerText = "Error: Unable to fetch data.";
+                                percentage = 0;
+                            } else {
+                                // document.getElementById("ratio-output-label").innerText = data.message;
+                                // 전달받은 상태에 따라 퍼센티지 계산
+                                percentage = statusMap[data.message] || 3; // 상태가 없으면 3%
+                            }
+                        } catch (error) {
+                            console.error("Error fetching ratio data:", error);
+                        }
+
+                        // 프로그레스 바와 텍스트 업데이트
+                        progressBarInner.style.width = percentage + '%';
+                        progressLabel.textContent = statusWord[percentage];
+                        document.getElementById('ratio-info-label').textContent = statusWord[percentage];
+                    }
+
+                    // 주기적으로 서버에서 텍스트 데이터 가져오기
+                    setInterval(fetchRatioData, 1000); // 1초마다 호출
+                </script>
             </div>
         </div>
         <div class="v659_1130">
@@ -152,24 +260,32 @@
             </div>
         </div>
         <div id="stages" class="v659_2113">
-            <div class="v659_1172"><span class="v659_1173">MAY FOREST</span></div>
+            <div onclick="stageClick()" class="v659_1172">
+                <span class="v659_1173">MAY FOREST</span>
+            </div>
             <div class="v659_1174">
-                <div class="v659_1175"></div><span class="v659_1176">SPRING GARDEN</span>
+                <div class="v659_1175"></div>
+                <span class="v659_1176">SPRING GARDEN</span>
             </div>
             <div class="v659_1177">
-                <div class="v659_1178"></div><span class="v659_1179">PINK AVENUE</span>
+                <div class="v659_1178"></div>
+                <span class="v659_1179">PINK AVENUE</span>
             </div>
             <div class="v659_1180">
-                <div class="v659_1181"></div><span class="v659_1182">SPARKE DOME</span>
+                <div class="v659_1181"></div>
+                <span class="v659_1182">SPARKE DOME</span>
             </div>
             <div class="v659_1183">
-                <div class="v659_1184"></div><span class="v659_1185">discovery park</span>
+                <div class="v659_1184"></div>
+                <span class="v659_1185">discovery park</span>
             </div>
             <div class="v659_1186">
-                <div class="v659_1187"></div><span class="v659_1188">SJF VILLAGE</span>
+                <div class="v659_1187"></div>
+                <span class="v659_1188">SJF VILLAGE</span>
             </div>
             <div class="v659_1189">
-                <div class="v659_1190"></div><span class="v659_1191">BRIGHT LAB</span>
+                <div class="v659_1190"></div>
+                <span class="v659_1191">BRIGHT LAB</span>
             </div>
         </div>
     </div>
