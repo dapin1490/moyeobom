@@ -4,11 +4,12 @@
 <head>
     <meta name="viewport" content="height=device-height, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Pretendard&display=swap" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/map_view.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <title>Document</title>
     <script>
         function stageClick() {
-            const div = document.querySelector(".v659_1114");
+            const div = document.querySelector(".info_popup");
             // 현재 display 상태를 확인하고 변경
             if (div.style.display === "none" || div.style.display === "") {
                 div.style.display = "block"; // div 보이기
@@ -21,87 +22,45 @@
             div.style.display = "none"; // div 숨기기
         }
     </script>
-    <!-- progress bar style -->
-    <style>
-        .progress-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-        }
-
-        .progress-bar {
-            position: relative;
-            width: 100%;
-            height: 20px;
-            background-color: #f2f2f2;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar-inner {
-            height: 100%;
-            background-color: #28a745; /* 기본 녹색 */
-            width: 2%; /* 초기 너비 */
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            color: black;
-        }
-
-        .progress-text {
-            width: 40px;
-            text-align: center;
-            color: #aaa; /* 텍스트 색상 */
-        }
-    </style>
 </head>
 
 <body>
-    <div class="v659_1030">
-        <div id="map_image" class="v659_1031"></div>
+    <div class="total_canvas">
+        <div id="map_image" class="map_image"></div>
         <div class="name"></div>
-        <div class="v659_2116">
-            <div class="v659_1038">
-                <div class="v659_1039"></div>
-                <span class="v659_1045">푸드코트</span>
+        <div class="foods" style="top: 371px; left: 343px;">
+            <div id="food01" class="food" style="top: 0px; left: 0px;">
+                <div class="food_mark"></div>
+                <span class="mark_name" style="width: 42px;">푸드코트</span>
             </div>
         </div>
         <!-- my position mark -->
-        <div class="v659_1047">
-            <div class="v659_1048">
-                <div class="v659_1049"></div>
-                <div class="v659_1050"></div>
+        <!-- <div class="human_position">
+            <div class="position_mark">
+                <div class="v659_1049" style="width: 18px; height: 18px; background: rgba(255, 255, 255, 1); opacity: 1; position: relative; top: 0px; left: 0px; border-radius: 50%; box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);"></div>
+                <div class="v659_1050" style="width: 14px; height: 14px; background: rgba(255, 49, 98, 1); opacity: 1; position: absolute; top: 2px; left: 2px; border-radius: 50%;"></div>
             </div>
             <div class="name"></div>
-        </div>
-        <div class="v659_2115">
-            <div class="v659_1052">
-                <div class="v659_1053"></div>
-                <span class="v659_1060">티켓부스&이벤트존</span>
+        </div> -->
+        <div class="event_zones">
+            <div class="event_zone">
+                <div class="event_mark"></div>
+                <span class="mark_name" style="width: 91px;">티켓부스&이벤트존</span>
             </div>
         </div>
-        <div class="v659_1114"> <!-- info popup -->
-            <div class="v659_1115"></div>
-            <span class="v659_1116">nothing but theives</span>
-            <span class="v659_1117">공연중</span>
-            <span class="v659_1118">MAY FOREST :</span>
-            <span id="ratio-info-label" class="v659_1119">여유</span>
+        <div class="info_popup"> <!-- info popup -->
+            <div class="info_window"></div>
+            <span class="info_text info_artist">nothing but theives</span>
+            <span class="info_text info_performance_status">공연중</span>
+            <span class="info_stage">MAY FOREST :</span>
+            <span id="ratio-info-label" class="info_status">여유</span>
             <!-- new tab button -->
             <a href="/map_view_info" style="text-decoration: none;">
-                <div class="v659_1120">
+                <div class="more_info_btn">
                 </div>
             </a>
             <!-- progress bar -->
-            <div class="v659_1123">
+            <div class="progress_bar">
                 <div class="progress-container">
                     <div class="progress-text">0%</div>
                     <div id="ratio-output" class="progress-bar">
@@ -111,118 +70,67 @@
                     </div>
                     <div class="progress-text">100%</div>
                 </div>
-                <script>
-                    async function fetchRatioData() {
-                        const progressBarInner = document.getElementById('ratio-output-inner');
-                        const progressLabel = document.getElementById('ratio-output-label');
-
-                        // 상태와 퍼센티지 매핑
-                        const statusMap = {
-                            '1': 33,   // 1/3
-                            '2': 66,   // 2/3
-                            '3': 100   // 전체
-                        };
-                        const statusWord = {
-                            33: '여유',
-                            66: '보통',
-                            100: '혼잡'
-                        };
-
-                        let percentage = 13;
-
-                        try {
-                            const response = await fetch("/get_ratio_code");
-                            const data = await response.json();
-
-                            if (data.error) {
-                                // document.getElementById("ratio-output-label").innerText = "Error: Unable to fetch data.";
-                                percentage = 0;
-                            } else {
-                                // document.getElementById("ratio-output-label").innerText = data.message;
-                                // 전달받은 상태에 따라 퍼센티지 계산
-                                percentage = statusMap[data.message] || 3; // 상태가 없으면 3%
-                            }
-                        } catch (error) {
-                            console.error("Error fetching ratio data:", error);
-                        }
-
-                        // 프로그레스 바와 텍스트 업데이트
-                        progressBarInner.style.width = percentage + '%';
-                        progressLabel.textContent = statusWord[percentage];
-                        document.getElementById('ratio-info-label').textContent = statusWord[percentage];
-                    }
-
-                    // 주기적으로 서버에서 텍스트 데이터 가져오기
-                    setInterval(fetchRatioData, 1000); // 1초마다 호출
-                </script>
             </div>
         </div>
-        <div class="v659_1130"></div>
-        <div id= "toilets" class="v659_2114">
-            <div class="v659_1066">
-                <div class="v659_1067">
-                    <div class="v659_1068"></div>
-                    <div class="v659_1069"></div>
-                    <div class="v659_1070">
-                        <div class="v659_1071"></div>
-                        <div class="v659_1072"></div>
-                        <div class="v659_1073"></div>
-                        <div class="v659_1074"></div>
-                    </div>
-                </div><span class="v659_1075">화장실</span>
+        <div class="gpsmark"></div>
+        <div id= "toilets" class="toilets">
+            <div class="toilet" style="top: 352px; left: 25px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1076">
-                <div class="v659_1077"></div>
-                <span class="v659_1085">화장실</span>
+            <div class="toilet" style="top: 0px; left: 223px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1086">
-                <div class="v659_1087"></div>
-                <span class="v659_1095">화장실</span>
+            <div class="toilet" style="top: 100px; left: 299px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1096">
-                <div class="v659_1097"></div>
-                <span class="v659_1105">화장실</span>
+            <div class="toilet" style="top: 61px; left: 0px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1141">
-                <div class="v659_1144"></div>
-                <span class="v659_1149">화장실</span>
+            <div class="toilet" style="top: 382px; left: 140px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1150">
-                <div class="v659_1151"></div>
-                <span class="v659_1159">화장실</span>
+            <div class="toilet" style="top: 322px; left: 222px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
-            <div class="v659_1161">
-                <div class="v659_1162"></div>
-                <span class="v659_1170">화장실</span>
+            <div class="toilet" style="top: 226px; left: 85px;">
+                <div class="toilet_mark"></div>
+                <span class="mark_name" style="width: 32px;">화장실</span>
             </div>
         </div>
-        <div id="stages" class="v659_2113">
+        <div id="stages" class="stages">
             <div onclick="stageClick()" class="v659_1172">
+                <div id="status_mark_demo" class="status_mark" style="background: rgba(20, 209, 0, 1);"></div>
                 <span class="v659_1173">MAY FOREST</span>
             </div>
-            <div class="v659_1174">
-                <div class="v659_1175"></div>
-                <span class="v659_1176">SPRING GARDEN</span>
+            <div class="stage" style="width: 143px; top: 265px; left: 6px;">
+                <div class="status_mark" style="background: rgba(255,99,130,1);"></div>
+                <span class="stage_name" style="width: 109px;">SPRING GARDEN</span>
             </div>
-            <div class="v659_1177">
-                <div class="v659_1178"></div>
-                <span class="v659_1179">PINK AVENUE</span>
+            <div class="stage" style="width: 123px; top: 242px; left: 214px;">
+                <div class="status_mark" style="background: rgba(255, 221, 0, 1);"></div>
+                <span class="stage_name" style="width: 89px;">PINK AVENUE</span>
             </div>
-            <div class="v659_1180">
-                <div class="v659_1181"></div>
-                <span class="v659_1182">SPARKE DOME</span>
+            <div class="stage" style="width: 129px; top: 104px; left: 278px;">
+                <div class="status_mark" style="background: rgba(255, 221, 0, 1);"></div>
+                <span class="stage_name" style="width: 95px;">SPARKE DOME</span>
             </div>
-            <div class="v659_1183">
-                <div class="v659_1184"></div>
-                <span class="v659_1185">discovery park</span>
+            <div class="stage" style="width: 122px; top: 0px; left: 87px;">
+                <div class="status_mark" style="background: rgba(255, 99, 130, 1);"></div>
+                <span class="stage_name" style="width: 115px;">discovery park</span>
             </div>
-            <div class="v659_1186">
-                <div class="v659_1187"></div>
-                <span class="v659_1188">SJF VILLAGE</span>
+            <div class="stage" style="width: 117px; top: 136px; left: 126px;">
+                <div class="status_mark" style="background: rgba(20, 209, 0, 1);"></div>
+                <span class="stage_name" style="width: 83px;">SJF VILLAGE</span>
             </div>
-            <div class="v659_1189">
-                <div class="v659_1190"></div>
-                <span class="v659_1191">BRIGHT LAB</span>
+            <div class="stage" style="width: 114px; top: 99px; left: 0px;">
+                <div class="status_mark" style="background: rgba(255, 221, 0, 1);"></div>
+                <span class="stage_name" style="width: 80px;">BRIGHT LAB</span>
             </div>
         </div>
         <div class="v659_1332">
@@ -244,6 +152,66 @@
             </div>
         </div>
     </div>
+    <!-- 진행바 데이터 불러오기 스크립트 -->
+    <script>
+        async function fetchRatioData() {
+            const color_code = ["rgba(20, 209, 0, 1)", "rgba(255, 221, 0, 1)", "rgba(255, 99, 130, 1)"];
+            const progressBarInner = document.getElementById('ratio-output-inner');
+            const progressLabel = document.getElementById('ratio-output-label');
+            const status_mark = document.getElementById('status_mark_demo');
+            const ratio_info_label = document.getElementById('ratio-info-label');
+
+            // 상태와 퍼센티지 매핑
+            const statusMap = {
+                '1': 33,   // 1/3
+                '2': 66,   // 2/3
+                '3': 100   // 전체
+            };
+            const statusWord = {
+                33: '여유',
+                66: '보통',
+                100: '혼잡'
+            };
+
+            let percentage = 1;
+
+            try {
+                const response = await fetch("/get_ratio_code");
+                const data = await response.json();
+
+                if (data.error) {
+                    percentage = 0;
+                } else {
+                    // 전달받은 상태에 따라 퍼센티지 계산
+                    percentage = statusMap[data.message] || 2; // 상태가 없으면 2%
+                }
+            } catch (error) {
+                console.error("Error fetching ratio data:", error);
+            }
+
+            if (percentage > 66) {
+                progressBarInner.style.backgroundColor = color_code[2];
+                status_mark.style.background = color_code[2];
+                ratio_info_label.style.color = color_code[2];
+            } else if (percentage > 33) {
+                progressBarInner.style.backgroundColor = color_code[1];
+                status_mark.style.background = color_code[1];
+                ratio_info_label.style.color = color_code[1];
+            } else {
+                progressBarInner.style.backgroundColor = color_code[0];
+                status_mark.style.background = color_code[0];
+                ratio_info_label.style.color = color_code[0];
+            }
+
+            // 프로그레스 바와 텍스트 업데이트
+            progressBarInner.style.width = percentage + '%';
+            progressLabel.textContent = statusWord[percentage];
+            ratio_info_label.textContent = statusWord[percentage];
+        }
+
+        // 주기적으로 서버에서 텍스트 데이터 가져오기
+        setInterval(fetchRatioData, 1000); // 1초마다 호출
+    </script>
 </body>
 
 </html>

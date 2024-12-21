@@ -4,74 +4,46 @@
 <head>
     <meta name="viewport" content="height=device-height, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Pretendard&display=swap" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/map_view_info.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <title>map view info</title>
-    <!-- progress bar style -->
-    <style>
-        .progress-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-        }
-
-        .progress-bar {
-            position: relative;
-            width: 100%;
-            height: 20px;
-            background-color: #f2f2f2;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar-inner {
-            height: 100%;
-            background-color: #28a745; /* 기본 녹색 */
-            width: 2%; /* 초기 너비 */
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            color: black;
-        }
-
-        .progress-text {
-            width: 40px;
-            text-align: center;
-            color: #aaa; /* 텍스트 색상 */
-        }
-    </style>
 </head>
 
 <body>
-    <div class="v659_900">
-        <div class="v659_2132">
-            <div class="v659_901"></div>
-            <div class="v659_2128">
-                <div class="v659_902"></div>
-                <div class="v659_903"></div><span class="v659_914">TIME TABLE</span>
-                <div class="v659_930"><span class="v659_931">21:40 - 23:00(80min)</span><span
-                        class="v659_932">NELL</span></div>
-                <div class="v659_927"><span class="v659_928">19:30 - 20:30(60min)</span><span class="v659_929">TAHITI
-                        80</span></div>
-                <div class="v659_924"><span class="v659_925">17:50 - 18:40(50min)</span><span class="v659_926">유라</span>
+    <div class="total_canvas">
+        <div class="inside_canvas">
+            <div class="inside_canvas_background"></div>
+            <div class="timetables">
+                <div class="timetables_background"></div>
+                <div class="timetables_header"></div>
+                <span class="timetables_title">TIME TABLE</span>
+                <div class="timetable" style="top: 71px;">
+                    <span class="time_name">크랙샷</span>
+                    <span class="time">14:10 - 14:50(40min)</span>
                 </div>
-                <div class="v659_918"><span class="v659_919">NOTING BUT THEIVES</span><span class="v659_920">16:30 -
-                        17:10(40min)</span></div>
-                <div class="v659_921"><span class="v659_922">15:20 - 16:00(40min)</span><span
-                        class="v659_923">이무진</span></div>
-                <div class="v659_915"><span class="v659_916">크랙샷</span><span class="v659_917">14:10 -
-                        14:50(40min)</span></div>
+                <div class="timetable" style="top: 105px;">
+                    <span class="time_name">이무진</span>
+                    <span class="time">15:20 - 16:00(40min)</span>
+                </div>
+                <div class="timetable" style="top: 139px; opacity: 1;">
+                    <span class="time_name">NOTING BUT THEIVES</span>
+                    <span class="time">16:30 - 17:10(40min)</span>
+                </div>
+                <div class="timetable" style="top: 173px;">
+                    <span class="time_name">유라</span>
+                    <span class="time">17:50 - 18:40(50min)</span>
+                </div>
+                <div class="timetable" style="top: 207px;">
+                    <span class="time_name">TAHITI 80</span>
+                    <span class="time">19:30 - 20:30(60min)</span>
+                </div>
+                <div class="timetable" style="top: 241px;">
+                    <span class="time_name">NELL</span>
+                    <span class="time">21:40 - 23:00(80min)</span>
+                </div>
             </div>
-            <div class="v659_2129">
-                <div class="v659_906">
+            <div class="performance_info">
+                <div class="progress_bar">
                     <div class="progress-container">
                         <div class="progress-text">0%</div>
                         <div id="ratio-output" class="progress-bar">
@@ -82,38 +54,38 @@
                         <div class="progress-text">100%</div>
                     </div>
                 </div>
-                <span class="v659_913">NOTING BUT THEIVES</span>
-                <div class="v659_933">
-                    <span class="v659_934">공연중</span>
-                    <span id="is_enter_ok" class="v659_935">입장</span>
+                <span class="performance_artist">NOTING BUT THEIVES</span>
+                <div class="performance_status">
+                    <span class="performance_is_on">공연중</span>
+                    <span id="is_enter_ok">입장 가능</span>
                 </div>
             </div>
-            <div class="v659_2130">
+            <div class="under_btns">
                 <a href="/area_feed">
-                    <div class="v659_905" style="cursor: pointer"></div>
-                    <span class="v659_936">대기 현장 보기</span>
+                    <div class="area_view" style="cursor: pointer">
+                        <span class="area_view_text">대기 현장 보기</span>
+                    </div>
                 </a>
-            </div>
-            <div class="v659_2131">
-                <div class="v659_904"></div><span class="v659_937">알림 받기</span>
+                <div class="alert_bookmark">
+                    <span class="alert_bookmark_text">알림 받기</span>
+                </div>
             </div>
         </div>
         <a href="/map_view">
-            <div class="v659_938" style="cursor: pointer">
-                <!-- <div class="v659_939"></div> -->
-            </div>
+            <div class="back_btn" style="cursor: pointer"></div>
         </a>
-        <div class="v659_940">
-            <div class="v659_941"></div><span class="v659_942">MAY FOREST</span>
-            <div class="v659_943"></div>
+        <div class="stage_info">
+            <div id="stage_status" class="stage_status"></div>
+            <span class="stage_name">MAY FOREST</span>
         </div>
-        <div class="name"></div>
     </div>
     <script>
         async function fetchRatioData() {
+            const color_code = ["rgba(20,209,0,1)", "rgba(255,221,0,1)", "rgba(255,99,130,1)"]; // 초, 노, 빨
             const progressBarInner = document.getElementById('ratio-output-inner');
             const progressLabel = document.getElementById('ratio-output-label');
             const enter_flag = document.getElementById('is_enter_ok');
+            const stage_status = document.getElementById('stage_status');
             enter_flag.textContent = "입장 가능";
 
             // 상태와 퍼센티지 매핑
@@ -135,10 +107,8 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    // document.getElementById("ratio-output-label").innerText = "Error: Unable to fetch data.";
                     percentage = 0;
                 } else {
-                    // document.getElementById("ratio-output-label").innerText = data.message;
                     // 전달받은 상태에 따라 퍼센티지 계산
                     percentage = statusMap[data.message] || 3; // 상태가 없으면 3%
                 }
@@ -148,10 +118,19 @@
 
             if (percentage > 66) {
                 enter_flag.textContent = "입장 불가";
-                enter_flag.style.color = "rgba(235, 64, 52, 1)";
+                enter_flag.style.color = color_code[2];
+                progressBarInner.style.backgroundColor = color_code[2];
+                stage_status.style.background = color_code[2];
+            } else if (percentage > 33) {
+                enter_flag.textContent = "입장 가능";
+                enter_flag.style.color = color_code[1];
+                progressBarInner.style.backgroundColor = color_code[1];
+                stage_status.style.background = color_code[1];
             } else {
                 enter_flag.textContent = "입장 가능";
-                enter_flag.style.color = "rgb(20, 209, 0)";
+                enter_flag.style.color = color_code[0];
+                progressBarInner.style.backgroundColor = color_code[0];
+                stage_status.style.background = color_code[0];
             }
 
             // 프로그레스 바와 텍스트 업데이트

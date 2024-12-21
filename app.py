@@ -1,7 +1,7 @@
 import torch
 import cv2
 import numpy as np
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, send_from_directory
 from ultralytics import YOLO
 from norfair import Detection, Tracker
 
@@ -134,6 +134,10 @@ tracker = Tracker(distance_function="euclidean", distance_threshold=120)
 
 # 웹캠 캡처
 cap = cv2.VideoCapture(0)
+
+@app.route('/static/fonts/<path:filename>')
+def custom_font(filename):
+    return send_from_directory('static/fonts', filename)
 
 @app.route("/")
 def index():

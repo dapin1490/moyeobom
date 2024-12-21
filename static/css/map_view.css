@@ -1,0 +1,480 @@
+* {
+  box-sizing: border-box;
+  font-family: Pretendard;
+}
+body {
+  font-size: 14px;
+}
+.total_canvas {
+  width: 393px;
+  height: 852px;
+  background: rgba(252, 252, 255, 1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.map_image {
+  width: 705px;
+  height: 100%;
+  background: url("../images/total_map.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 0px;
+  left: -172px;
+  overflow: hidden;
+}
+.foods {
+  width: 42px;
+  height: 40px;
+  opacity: 1;
+  position: absolute;
+  overflow: hidden;
+}
+.food, #food01 {
+  width: 42px;
+  height: 40px;
+  opacity: 1;
+  position: relative;
+  overflow: hidden;
+}
+.food_mark {
+  width: 22px;
+  height: 22px;
+  background: url("../images/food.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 0px;
+  left: 10px;
+  overflow: hidden;
+}
+.mark_name {
+  color: rgba(90, 90, 90, 1);
+  position: absolute;
+  top: 26px;
+  left: 0px;
+  font-weight: 800;
+  font-size: 12px;
+  opacity: 1;
+  text-align: left;
+  -webkit-text-stroke: 0.5px white;
+}
+.human_position {
+  width: 18px;
+  height: 26px;
+  background: url("../images/v659_1047.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 264px;
+  left: 206px;
+  overflow: hidden;
+}
+.position_mark {
+  width: 18px;
+  height: 18px;
+  background: url("../images/v659_1048.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.event_zones {
+  width: 91px;
+  height: 40px;
+  opacity: 1;
+  position: absolute;
+  top: 573px;
+  left: 70px;
+  overflow: hidden;
+}
+.event_zone {
+  width: 91px;
+  height: 40px;
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.event_mark {
+  width: 22px;
+  height: 22px;
+  background: url("../images/eventzone.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 0px;
+  left: 34px;
+  overflow: hidden;
+}
+.info_popup {
+  display: none; /* 처음에는 숨김 상태 */
+  width: 361px;
+  height: 156px;
+  opacity: 1;
+  position: absolute;
+  top: 668px;
+  left: 16px;
+  overflow: hidden;
+}
+.info_window {
+  width: 361px;
+  height: 156px;
+  background: rgba(255,255,255,1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border: 1px solid rgba(239,239,255,1);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  overflow: hidden;
+}
+.info_text {
+  color: rgba(84, 84, 84, 1);
+  position: absolute;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.info_artist {
+  width: 153px;
+  top: 53px;
+  left: 20px;
+}
+.info_performance_status {
+  width: 37px;
+  top: 53px;
+  left: 179px;
+}
+.info_stage {
+  width: 109px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 28px;
+  left: 20px;
+  font-weight: Bold;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.info_status {
+  width: 28px;
+  color: rgba(20,209,0,1);
+  position: absolute;
+  top: 28px;
+  left: 133px;
+  font-weight: Bold;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.more_info_btn {
+  width: 42px;
+  height: 42px;
+  background: url("../images/more_info_btn.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 28px;
+  left: 299px;
+  overflow: hidden;
+}
+.progress_bar {
+  width: 321px;
+  height: 46px;
+  opacity: 1;
+  position: absolute;
+  top: 94px;
+  left: 20px;
+  overflow: hidden;
+}
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  height: 100%;
+  background-color: #28a745; /* 기본 녹색 */
+  width: 2%; /* 초기 너비 */
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.progress-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: black;
+}
+.progress-text {
+  width: 40px;
+  text-align: center;
+  color: #aaa; /* 텍스트 색상 */
+}
+.gpsmark {
+  width: 42px;
+  height: 42px;
+  background: url("../images/gpsmark.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 610px;
+  left: 335px;
+  overflow: hidden;
+}
+.toilets {
+  width: 331px;
+  height: 423px;
+  opacity: 1;
+  position: absolute;
+  top: 145px;
+  left: 43px;
+  overflow: hidden;
+}
+.toilet {
+  width: 32px;
+  height: 40px;
+  opacity: 1;
+  position: absolute;
+  overflow: hidden;
+}
+.toilet_mark {
+  width: 22px;
+  height: 22px;
+  background: url("../images/toilet.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  overflow: hidden;
+}
+.stages {
+  width: 407px;
+  height: 340px;
+  opacity: 1;
+  position: absolute;
+  top: 190px;
+  left: 7px;
+  overflow: hidden;
+}
+.v659_1172 {
+  width: 115px;
+  height: 29px;
+  background: rgba(255,255,255,1);
+  padding: 6px 10px;
+  margin: 4px;
+  opacity: 1;
+  position: absolute;
+  top: 303px;
+  left: 138px;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.v659_1172:hover {
+  background: rgb(177, 177, 177);
+  overflow: hidden;
+}
+.v659_1173 {
+  width: 86px;
+  color: rgba(0,0,0,0.699999988079071);
+  position: absolute;
+  top: 6px;
+  left: 22px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.stage {
+  height: 29px;
+  background: rgba(255, 255, 255, 1);
+  padding: 6px 10px;
+  margin: 4px;
+  opacity: 1;
+  position: absolute;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+  overflow: hidden;
+}
+.status_mark {
+  width: 8px;
+  height: 8px;
+  opacity: 1;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border-radius: 50%;
+}
+.stage_name {
+  color: rgba(0, 0, 0, 0.699999988079071);
+  position: absolute;
+  top: 6px;
+  left: 22px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.name {
+  color: #fff;
+}
+.v659_1332 {
+  width: 394px;
+  height: 852px;
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.v659_1331 {
+  width: 394px;
+  height: 852px;
+  background: rgba(0,0,0,0.30000001192092896);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.v659_1333 {
+  width: 310px;
+  height: 229px;
+  background: rgba(255,255,255,1);
+  opacity: 1;
+  position: absolute;
+  top: 312px;
+  left: 42px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  overflow: hidden;
+}
+.v659_1334 {
+  width: 139px;
+  height: 21px;
+  margin: 4px;
+  opacity: 1;
+  position: absolute;
+  top: 454px;
+  left: 129px;
+  overflow: hidden;
+}
+.v659_1335 {
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+  position: absolute;
+  top: 4px;
+  left: 0px;
+  border: 1px solid rgba(145,145,150,1);
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  overflow: hidden;
+}
+.v659_1336 {
+  width: 123px;
+  color: rgba(145,145,150,1);
+  position: absolute;
+  top: 0px;
+  left: 16px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: center;
+}
+.v659_1337 {
+  width: 271px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 342px;
+  left: 61px;
+  font-weight: Medium;
+  font-size: 16px;
+  opacity: 1;
+  text-align: center;
+}
+.v659_1338 {
+  width: 310px;
+  height: 33px;
+  opacity: 1;
+  position: absolute;
+  top: 495px;
+  left: 42px;
+  overflow: hidden;
+}
+.v659_1340 {
+  width: 25px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 13px;
+  left: 143px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: center;
+}
+.v659_1341 {
+  width: 310px;
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.v659_1342 {
+  width: 310px;
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border: 1px solid rgba(231,231,237,1);
+}

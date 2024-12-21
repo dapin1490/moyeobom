@@ -1,0 +1,298 @@
+* {
+  box-sizing: border-box;
+  font-family: Pretendard;
+}
+body {
+  font-size: 14px;
+}
+.total_canvas {
+  width: 393px;
+  height: 852px;
+  background: rgba(252, 252, 255, 1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.inside_canvas {
+  width: 361px;
+  height: 710px;
+  opacity: 1;
+  position: absolute;
+  top: 114px;
+  left: 16px;
+  overflow: hidden;
+}
+.inside_canvas_background {
+  width: 361px;
+  height: 710px;
+  background: rgba(255,255,255,1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border: 1px solid rgba(239,239,255,1);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  overflow: hidden;
+}
+.timetables {
+  width: 329px;
+  height: 361px;
+  opacity: 1;
+  position: absolute;
+  top: 177px;
+  left: 16px;
+  overflow: hidden;
+}
+.timetables_background {
+  width: 329px;
+  height: 361px;
+  background: rgba(252,252,255,1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border: 1px solid rgba(238,239,245,1);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  overflow: hidden;
+}
+.timetables_header {
+  width: 329px;
+  opacity: 1;
+  position: absolute;
+  top: 47px;
+  left: 0px;
+  border: 1px solid rgba(238,239,245,1);
+}
+.timetables_title {
+  width: 78px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 16px;
+  left: 125px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.timetable {
+  width: 294px;
+  height: 14px;
+  opacity: 0.3;
+  position: absolute;
+  left: 17px;
+  overflow: hidden;
+}
+.time {
+  width: 120px;
+  color: rgba(84,84,84,1);
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  font-weight: Medium;
+  font-size: 12px;
+  opacity: 1;
+  text-align: right;
+}
+.time_name {
+  width: 130px;
+  color: rgba(0, 0, 0, 1);
+  position: relative;
+  top: 0px;
+  left: 0px;
+  font-weight: Bold;
+  font-size: 12px;
+  opacity: 1;
+  text-align: left;
+}
+.performance_info {
+  width: 321px;
+  height: 117px;
+  opacity: 1;
+  position: absolute;
+  top: 36px;
+  left: 20px;
+  overflow: hidden;
+}
+.progress_bar {
+  width: 321px;
+  height: 46px;
+  opacity: 1;
+  position: absolute;
+  top: 71px;
+  left: 0px;
+  overflow: hidden;
+}
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+.progress-bar, #ratio-output {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar-inner, #ratio-output-inner {
+  height: 100%;
+  background-color: #28a745; /* 기본 녹색 */
+  width: 2%; /* 초기 너비 */
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.progress-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: black;
+}
+.progress-text {
+  width: 40px;
+  text-align: center;
+  color: #aaa; /* 텍스트 색상 */
+}
+.performance_artist {
+  width: 208px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 0px;
+  left: 57px;
+  font-weight: Bold;
+  font-size: 20px;
+  opacity: 1;
+  text-align: left;
+}
+.performance_status {
+  width: 150px;
+  height: 19px;
+  opacity: 1;
+  position: absolute;
+  top: 32px;
+  left: 106px;
+  overflow: hidden;
+}
+.performance_is_on {
+  width: 42px;
+  color: rgba(0,0,0,1);
+  position: relative;
+  top: 0px;
+  left: 0px;
+  font-weight: Medium;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+#is_enter_ok {
+  width: 59px;
+  color: rgba(20,209,0,1);
+  position: absolute;
+  top: 0px;
+  left: 50px;
+  font-weight: Bold;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.area_view {
+  width: 329px;
+  height: 56px;
+  background: rgba(238, 239, 245, 1);
+  border-radius: 16px;
+  opacity: 1;
+  position: absolute;
+  top: 562px;
+  left: 16px;
+  overflow: hidden;
+}
+.area_view_text {
+  width: 91px;
+  color: rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 18px;
+  left: 119px;
+  font-weight: Medium;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.alert_bookmark {
+  width: 329px;
+  height: 56px;
+  background: rgba(238, 239, 245, 0);
+  opacity: 1;
+  position: absolute;
+  border-radius: 16px;
+  top: 630px;
+  left: 16px;
+  overflow: hidden;
+}
+.alert_bookmark_text {
+  width: 60px;
+  color: rgba(191, 191, 191, 1);
+  position: absolute;
+  top: 18px;
+  left: 135px;
+  font-weight: Medium;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.back_btn {
+  width: 28px;
+  height: 28px;
+  background: url("../images/back_btn.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 64px;
+  left: 12px;
+  overflow: hidden;
+}
+.stage_info {
+  width: 130px;
+  height: 32px;
+  background: rgba(239,239,247,1);
+  border-radius: 30px;
+  opacity: 1;
+  position: absolute;
+  top: 62px;
+  left: 131px;
+  overflow: hidden;
+}
+.stage_status {
+  width: 10px;
+  height: 10px;
+  background: rgba(20,209,0,1);
+  opacity: 1;
+  position: absolute;
+  top: 11px;
+  left: 12px;
+  border-radius: 50%;
+}
+.stage_name {
+  width: 86px;
+  color: rgba(0,0,0,1);
+  position: absolute;
+  top: 7px;
+  left: 28px;
+  font-weight: Medium;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
