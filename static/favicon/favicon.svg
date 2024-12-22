@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="155" height="155"><svg width="155" height="155" viewBox="0 0 155 155" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_727_365)">
+<path d="M38.2106 116.789V83.304H0V136.181C0 148.937 7.59295 155 20.9216 155H71.5868V116.789H38.2106Z" fill="#FF3162"></path>
+<path d="M155 0H83.4133V38.2106H155V0Z" fill="#FF3162"></path>
+<path d="M116.79 116.789H83.4133V155H155V50.037H116.79V116.789Z" fill="#FF3162"></path>
+<path d="M71.5868 38.2106V0H0V71.4775H38.2106V38.2106H71.5868Z" fill="#FF3162"></path>
+<path d="M91.9348 73.9357H81.0644V63.0652C81.0644 61.0987 79.4802 59.4872 77.4864 59.4872C75.4926 59.4872 73.9084 61.0714 73.9084 63.0652V73.9357H63.0379C61.0714 73.9357 59.46 75.5472 59.46 77.5137C59.46 79.4802 61.0441 81.0916 63.0379 81.0916H73.9084V91.9621C73.9084 93.9286 75.4926 95.5401 77.4864 95.5401C79.4802 95.5401 81.0644 93.956 81.0644 91.9621V81.0916H91.9348C93.9014 81.0916 95.5128 79.5075 95.5128 77.5137C95.5128 75.5198 93.9287 73.9357 91.9348 73.9357Z" fill="#FF3162"></path>
+</g>
+<defs>
+<clipPath id="SvgjsClipPath1051">
+<rect width="155" height="155" fill="white"></rect>
+</clipPath>
+</defs>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>
