@@ -29,24 +29,13 @@
         .nav a:hover {
             text-decoration: underline;
         }
-        li > a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
-        }
-        li > a:hover {
-            text-decoration: underline;
-        }
-        ul {
-            display: table;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        a.active {
-            background-color: #ff8a8a; /* 강조할 배경색 */
-            /* border: 5px solid #007BFF; */ /* 강조 표시 */
-            font-weight: bold; /* 글씨 굵게 */
+        select#videoDropdown {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
         }
     </style>
 </head>
@@ -61,13 +50,12 @@
     </div>
     <div>
         <h3>Select a Video</h3>
-        <ul>
+        <select id="videoDropdown">
+            <option value="">동영상을 선택하세요</option>
             {% for video in video_files %}
-                <li>
-                    <a href="/video_feed/{{ video }}" target="_blank">{{ video }}</a>
-                </li>
+                <option value="/video_feed/{{ video }}">{{ video }}</option>
             {% endfor %}
-        </ul>
+        </select>
     </div>
     <div>
         <h3>Live Detection</h3>
@@ -76,55 +64,53 @@
         <img id="videoStream" src="" alt="Video Stream" style="width: 393px;">
     </div>
     <script>
-        const videoLinks = document.querySelectorAll('li > a'); // 모든 링크 선택
+        // 비디오 선택 재생
+        const videoDropdown = document.getElementById('videoDropdown'); // 드롭다운 메뉴
         const videoStream = document.getElementById('videoStream'); // 비디오 스트림 요소
 
-        videoLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault(); // 기본 동작 방지
-                const videoURL = link.href; // 비디오 URL 가져오기
-                const fileName = link.textContent.trim(); // 파일명 가져오기
+        videoDropdown.addEventListener('change', () => {
+            const selectedOption = videoDropdown.options[videoDropdown.selectedIndex]; // 선택된 옵션
+            const videoURL = selectedOption.value; // 선택된 옵션의 값 (URL)
+            const fileName = selectedOption.textContent.trim(); // 선택된 옵션의 텍스트 (파일명)
 
+            if (videoURL) {
                 // 비디오 스트림 소스 업데이트
                 videoStream.src = videoURL;
-
-                // 기존 활성 링크 초기화
-                videoLinks.forEach(l => l.classList.remove('active'));
-
-                // 현재 선택된 링크 강조
-                link.classList.add('active');
-            });
+            } else {
+                // 아무것도 선택하지 않았을 경우 초기화
+                videoStream.src = "";
+            }
         });
-    </script>
-    <script>
-        async function fetchCountData() {
-            try {
-                const response = await fetch("/get_count_data");
-                const data = await response.json();
 
-                if (data.error) {
-                    document.getElementById("count-output").innerText = "Error: Unable to fetch data.";
+        // 비디오 탐지 결과 로드 및 적용
+        const count_output = document.getElementById("count-output");
+        const ratio_output = document.getElementById("ratio-output");
+
+        async function fetchDetectionData() {
+            try {
+                const response_count = await fetch("/get_count_data");
+                const data_count = await response_count.json();
+                // console.log(`count data: ${data_count.message}`);
+
+                if (data_count.error) {
+                    count_output.innerText = "Error: Unable to fetch data.";
                 } else {
-                    document.getElementById("count-output").innerText = data.message;
+                    count_output.innerText = data_count.message;
                 }
+
             } catch (error) {
                 console.error("Error fetching count data:", error);
             }
-        }
 
-        // 주기적으로 서버에서 텍스트 데이터 가져오기
-        setInterval(fetchCountData, 1000); // 1초마다 호출
-    </script>
-    <script>
-        async function fetchRatioData() {
             try {
-                const response = await fetch("/get_ratio_data");
-                const data = await response.json();
+                const response_ratio = await fetch("/get_ratio_data");
+                const data_ratio = await response_ratio.json();
+                // console.log(`ratio data: ${data_ratio.message}`);
 
-                if (data.error) {
-                    document.getElementById("ratio-output").innerText = "Error: Unable to fetch data.";
+                if (data_ratio.error) {
+                    ratio_output.innerText = "Error: Unable to fetch data.";
                 } else {
-                    document.getElementById("ratio-output").innerText = data.message;
+                    ratio_output.innerText = data_ratio.message;
                 }
             } catch (error) {
                 console.error("Error fetching ratio data:", error);
@@ -132,7 +118,7 @@
         }
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
-        setInterval(fetchRatioData, 1000); // 1초마다 호출
+        setInterval(fetchDetectionData, 1000); // 1초마다 호출
     </script>
 </body>
 </html>
