@@ -134,6 +134,81 @@ def process_cam_feed():
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
+def detect_video(video_path):
+    global previous_positions, message_count, complex_ratio, message_ratio
+    cap = cv2.VideoCapture(video_path)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # YOLO 탐지 수행
+        results = model(frame)
+        detections = []
+        # 사람 수
+        people_count = 0
+        frame_area = frame.shape[0] * frame.shape[1]
+        total_person_area = 0
+
+        for result in results[0].boxes:
+            if result.cls == 0:  # 사람 클래스
+                people_count += 1
+                x1, y1, x2, y2 = map(int, result.xyxy[0])
+                center_x = (x1 + x2) // 2
+                center_y = (y1 + y2) // 2
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                detections.append(Detection(np.array([center_x, center_y])))
+                person_area = (x2 - x1) * (y2 - y1)
+                total_person_area += person_area
+
+        # 추적 업데이트
+        tracked_objects = tracker.update(detections)
+
+        # 현재 프레임의 방향 통계
+        current_direction_counts = {"left": 0, "right": 0, "up": 0, "down": 0}
+
+        # 추적 결과 시각화 및 방향 계산
+        for obj in tracked_objects:
+            obj_id = obj.id
+            position = obj.estimate
+            x, y = map(int, position[0])
+
+            # 이전 위치와 비교하여 이동 방향 계산
+            if obj_id in previous_positions:
+                prev_x, prev_y = previous_positions[obj_id]
+                direction = calculate_direction((prev_x, prev_y), (x, y))
+                current_direction_counts[direction] += 1
+            previous_positions[obj_id] = (x, y)
+
+            # 객체 ID 및 현재 위치 표시
+            cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
+            cv2.putText(frame, f"ID: {obj_id}", (x + 5, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        # 현재 프레임에서 가장 많은 이동 방향 찾기
+        most_movement_direction = max(current_direction_counts, key=current_direction_counts.get)
+        most_movement_count = current_direction_counts[most_movement_direction]
+
+        # 방향 결과 표시
+        message_count = f"People: {people_count}\nMost movement: {most_movement_direction} ({most_movement_count})"
+
+        # 면적 비율 계산
+        area_ratio = (total_person_area / frame_area) * 100
+        message_ratio = f"Person Area Ratio: "
+        if area_ratio < complex_ratio[0]:
+            message_ratio += "여유"
+        elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
+            message_ratio += "보통"
+        else:
+            message_ratio += "혼잡"
+
+        # 프레임을 JPEG로 인코딩
+        _, buffer = cv2.imencode('.jpg', frame)
+        frame_bytes = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+    cap.release()
+
 app = Flask(__name__)
 
 # YOLO 모델 로드
@@ -180,6 +255,19 @@ def area_feed():
 @app.route("/cam_feed")
 def cam_feed():
     return Response(process_cam_feed(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route('/video_feed/<video_name>')
+def video_view_feed(video_name):
+    video_path = f'static/videos/{video_name}'
+    return Response(detect_video(video_path), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_view')
+def video_page():
+    # 동영상 목록 가져오기
+    import os
+    video_files = os.listdir('static/videos/')
+    video_files.remove('.placeholder')
+    return render_template('video_view.html', video_files=video_files)
 
 @app.route("/detection_data_feed")
 def process_area_data():
