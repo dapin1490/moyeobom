@@ -38,5 +38,19 @@
         <a href="/area_view">Person Area Ratio</a>
         <a href="/map_view">demo map view</a>
     </div>
+    <script>
+        async function fetchRatioData() {
+            try {
+                const response = await fetch("/detection_data_feed");
+                const data = await response.json();
+                console.log("status code: " + data.ratio_code);
+            } catch (error) {
+                console.error("Error fetching ratio data:", error);
+            }
+        }
+
+        // 주기적으로 서버에서 텍스트 데이터 가져오기
+        setInterval(fetchRatioData, 1000); // 1초마다 호출
+    </script>
 </body>
 </html>

@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="under_btns">
-                <a href="/area_feed">
+                <a href="/cam_feed">
                     <div class="area_view" style="cursor: pointer">
                         <span class="area_view_text">대기 현장 보기</span>
                     </div>
@@ -100,17 +100,20 @@
                 100: '혼잡'
             };
 
-            let percentage = 1;
+            var percentage = 1;
+            var scode = 1;
 
             try {
-                const response = await fetch("/get_ratio_code");
+                const response = await fetch("/detection_data_feed");
                 const data = await response.json();
+                scode = data.ratio_code;
+                console.log("status code: " + scode);
 
                 if (data.error) {
                     percentage = 0;
                 } else {
                     // 전달받은 상태에 따라 퍼센티지 계산
-                    percentage = statusMap[data.message] || 3; // 상태가 없으면 3%
+                    percentage = statusMap[scode] || 3; // 상태가 없으면 3%
                 }
             } catch (error) {
                 console.error("Error fetching ratio data:", error);
@@ -136,7 +139,6 @@
             // 프로그레스 바와 텍스트 업데이트
             progressBarInner.style.width = percentage + '%';
             progressLabel.textContent = statusWord[percentage];
-            document.getElementById('ratio-info-label').textContent = statusWord[percentage];
         }
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
