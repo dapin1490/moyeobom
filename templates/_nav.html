@@ -1,0 +1,24 @@
+{# 공통 네비게이션 컴포넌트 #}
+{# 사용법: {% include '_nav.html' %} #}
+{# 현재 경로는 request.path로 자동 감지됩니다 #}
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/" class="nav-link {% if request.path == '/' or request.path == '' %}active{% endif %}">
+            HOME
+        </a>
+        <a href="/count_view" class="nav-link {% if request.path == '/count_view' %}active{% endif %}">
+            People Counter
+        </a>
+        <a href="/area_view" class="nav-link {% if request.path == '/area_view' %}active{% endif %}">
+            Person Area Ratio
+        </a>
+        <a href="/map_view" class="nav-link {% if request.path == '/map_view' %}active{% endif %}">
+            demo map view
+        </a>
+        <a href="/video_view" class="nav-link {% if request.path == '/video_view' %}active{% endif %}">
+            video view
+        </a>
+    </div>
+</nav>
+

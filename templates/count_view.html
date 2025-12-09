@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <title>count view</title>
     <style>
         body {
@@ -17,29 +19,11 @@
             height: auto;
             margin: 20px auto;
         }
-        .nav {
-            margin-bottom: 20px;
-        }
-        .nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
-        }
-        .nav a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
     <h1>People Counter and Tracker</h1>
-    <div class="nav">
-        <a href="/">HOME</a>
-        <a href="/count_view">People Counter</a>
-        <a href="/area_view">Person Area Ratio</a>
-        <a href="/map_view">demo map view</a>
-        <a href="/video_view">video view</a>
-    </div>
+    {% include '_nav.html' %}
     <div id="count-output">Loading...</div>
     <img id="live-feed" class="video-feed" src="/video_feed" alt="Live feed">
     <script>
