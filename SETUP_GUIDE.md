@@ -83,12 +83,19 @@ conda activate moyeobom
 
 ### Step 3: 필요한 프로그램 설치
 
-프로젝트 폴더에서 다음 명령어를 실행하세요:
+프로젝트 폴더에서 다음 명령어 중 하나를 실행하세요:
 
+**방법 1: requirements.txt 사용 (권장)**
+```bash
+pip install -r requirements.txt
+```
+
+**방법 2: 개별 패키지 설치**
 ```bash
 pip install ultralytics flask norfair opencv-python numpy torch
 ```
 
+> 💡 **팁:** `requirements.txt` 파일이 있다면 방법 1을 사용하는 것이 더 쉽고 안전합니다.  
 > ⏱️ **시간이 걸릴 수 있습니다** (5-10분 정도, 인터넷 속도에 따라 다름)
 
 ### Step 4: 실행
@@ -151,7 +158,14 @@ python app.py
 **원인:** 필요한 프로그램이 설치되지 않음
 
 **해결 방법:**
-다시 설치 명령어 실행:
+프로젝트 폴더에서 다음 명령어 중 하나를 실행하세요:
+
+**방법 1: requirements.txt 사용 (권장)**
+```bash
+pip install -r requirements.txt
+```
+
+**방법 2: 개별 패키지 설치**
 ```bash
 pip install ultralytics flask norfair opencv-python numpy torch
 ```
