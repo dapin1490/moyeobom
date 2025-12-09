@@ -1,0 +1,26 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "debug": true
+  },
+  "camera": {
+    "index": 0,
+    "description": "웹캠 인덱스 (0이 기본 웹캠, 다른 웹캠을 사용하려면 1, 2 등으로 변경)"
+  },
+  "model": {
+    "path": "yolo11x.pt",
+    "description": "YOLO 모델 파일 경로"
+  },
+  "tracker": {
+    "distance_function": "euclidean",
+    "distance_threshold": 120,
+    "description": "객체 추적기 설정 (distance_threshold 값이 클수록 더 멀리 있는 객체도 같은 객체로 인식)"
+  },
+  "complex_ratio": {
+    "low_threshold": 30,
+    "high_threshold": 70,
+    "description": "혼잡도 기준 비율 (여유: 0-30%, 보통: 30-70%, 혼잡: 70% 이상)"
+  }
+}
+

@@ -227,25 +227,62 @@ pip install ultralytics flask norfair opencv-python numpy torch
 
 ## 🔧 간단한 설정 변경
 
+설정을 변경하려면 `config.json` 파일을 수정하면 됩니다! 코드를 직접 수정할 필요가 없습니다.
+
+### 📝 config.json 파일 열기
+
+프로젝트 폴더에서 `config.json` 파일을 메모장이나 텍스트 에디터로 엽니다.
+
 ### 포트 번호 변경 (다른 프로그램과 충돌할 때)
 
-`app.py` 파일의 마지막 줄을 찾아서:
-```python
-app.run(host="0.0.0.0", port=5000, debug=True)
+`config.json` 파일에서 다음 부분을 찾아서:
+```json
+"server": {
+  "host": "0.0.0.0",
+  "port": 5000,
+  "debug": true
+}
 ```
-`port=5000`을 다른 번호로 변경 (예: `port=5001`)
+`"port": 5000`을 다른 번호로 변경 (예: `"port": 5001`)
 
 그러면 `http://localhost:5001`로 접속해야 합니다.
 
 ### 혼잡도 기준 변경
 
-`app.py` 파일에서 다음 줄을 찾아서:
-```python
-complex_ratio = [30, 70]
+`config.json` 파일에서 다음 부분을 찾아서:
+```json
+"complex_ratio": {
+  "low_threshold": 30,
+  "high_threshold": 70
+}
 ```
 숫자를 변경하면 혼잡도 기준이 바뀝니다.
+- `low_threshold`: 여유와 보통의 경계 (기본값: 30)
+- `high_threshold`: 보통과 혼잡의 경계 (기본값: 70)
 
-> ⚠️ **주의:** 코드를 수정한 후에는 프로그램을 다시 시작해야 합니다.
+### 웹캠 변경
+
+여러 개의 웹캠이 연결되어 있을 때 다른 웹캠을 사용하려면:
+```json
+"camera": {
+  "index": 0
+}
+```
+`"index": 0`을 `"index": 1` 또는 `"index": 2` 등으로 변경하세요.
+
+### 추적기 민감도 조정
+
+객체 추적이 너무 민감하거나 둔감할 때:
+```json
+"tracker": {
+  "distance_threshold": 120
+}
+```
+- 값이 클수록: 더 멀리 있는 객체도 같은 객체로 인식 (더 민감)
+- 값이 작을수록: 가까운 객체만 같은 객체로 인식 (덜 민감)
+
+> ⚠️ **주의:** `config.json` 파일을 수정한 후에는 프로그램을 다시 시작해야 합니다.  
+> 💡 **팁:** JSON 파일을 수정할 때는 쉼표(`,`)와 따옴표(`"`)를 정확히 입력해야 합니다. 오타가 있으면 프로그램이 실행되지 않을 수 있습니다.
 
 ---
 

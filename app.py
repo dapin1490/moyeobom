@@ -1,15 +1,38 @@
 import torch
 import cv2
 import numpy as np
+import json
+import os
 from flask import Flask, render_template, Response, jsonify, send_from_directory
 from ultralytics import YOLO
 from norfair import Detection, Tracker
 
 # ============================================================================
+# 설정 파일 로드
+# ============================================================================
+def load_config():
+    """config.json 파일에서 설정을 로드합니다."""
+    config_path = "config.json"
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    else:
+        # 기본 설정 (config.json이 없을 경우)
+        return {
+            "server": {"host": "0.0.0.0", "port": 5000, "debug": True},
+            "camera": {"index": 0},
+            "model": {"path": "yolo11x.pt"},
+            "tracker": {"distance_function": "euclidean", "distance_threshold": 120},
+            "complex_ratio": {"low_threshold": 30, "high_threshold": 70}
+        }
+
+config = load_config()
+
+# ============================================================================
 # 전역 변수
 # ============================================================================
 previous_positions = {}  # 이전 위치 저장
-complex_ratio = [30, 70]  # 혼잡도 기준 비율
+complex_ratio = [config["complex_ratio"]["low_threshold"], config["complex_ratio"]["high_threshold"]]
 message_count = ""
 message_ratio = ""
 ratio_code = ''
@@ -226,13 +249,16 @@ def detect_video(video_path):
 app = Flask(__name__)
 
 # YOLO 모델 로드
-model = YOLO("yolo11x.pt")
+model = YOLO(config["model"]["path"])
 
 # Norfair 추적기 초기화
-tracker = Tracker(distance_function="euclidean", distance_threshold=120)
+tracker = Tracker(
+    distance_function=config["tracker"]["distance_function"],
+    distance_threshold=config["tracker"]["distance_threshold"]
+)
 
 # 웹캠 캡처
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(config["camera"]["index"])
 
 
 # ============================================================================
@@ -401,4 +427,8 @@ def get_ratio_code():
 # 메인 실행
 # ============================================================================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host=config["server"]["host"],
+        port=config["server"]["port"],
+        debug=config["server"]["debug"]
+    )
