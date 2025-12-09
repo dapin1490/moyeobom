@@ -54,7 +54,7 @@ def calculate_direction(prev_pos, curr_pos):
 # 프레임 처리 함수
 # ============================================================================
 def process_frames():
-    global previous_positions, message_count
+    global previous_positions, message_count, complex_ratio, message_ratio
 
     while True:
         ret, frame = cap.read()
@@ -68,6 +68,8 @@ def process_frames():
 
         # 사람 수
         people_count = 0
+        frame_area = frame.shape[0] * frame.shape[1]
+        total_person_area = 0
 
         # 탐지 결과에서 사람만 필터링
         for result in results[0].boxes:
@@ -78,6 +80,8 @@ def process_frames():
                 center_y = (y1 + y2) // 2
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 detections.append(Detection(np.array([center_x, center_y])))
+                person_area = (x2 - x1) * (y2 - y1)
+                total_person_area += person_area
 
         # 추적 업데이트
         tracked_objects = tracker.update(detections)
@@ -108,6 +112,15 @@ def process_frames():
 
         # 방향 결과 표시
         message_count = f"People: {people_count}\nMost movement: {most_movement_direction} ({most_movement_count})"
+
+        # 면적 비율 계산
+        area_ratio = (total_person_area / frame_area) * 100
+        if area_ratio < complex_ratio[0]:
+            message_ratio = "Person Area Ratio: 여유"
+        elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
+            message_ratio = "Person Area Ratio: 보통"
+        else:
+            message_ratio = "Person Area Ratio: 혼잡"
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)

@@ -78,6 +78,7 @@
                             <label for="videoDropdown" class="form-label">동영상 파일</label>
                             <select id="videoDropdown" class="form-control form-select">
                                 <option value="">동영상을 선택하세요</option>
+                                <option value="/video_feed">라이브 스트림</option>
                                 {% for video in video_files %}
                                     <option value="/video_feed/{{ video }}">{{ video }}</option>
                                 {% endfor %}
@@ -123,23 +124,23 @@
             <div id="error-message" class="error-message" style="display: none;"></div>
 
             <!-- 비디오 스트림 영역 -->
-            <div class="video-container">
+            <div class="video-container" id="video-container">
                 <div id="video-placeholder" class="video-placeholder">
                     동영상을 선택하면 여기에 표시됩니다
                 </div>
-                <img id="videoStream" class="video-feed" src="" alt="Video Stream" style="display: none;">
             </div>
         </main>
     </div>
 
     <script>
         const videoDropdown = document.getElementById('videoDropdown');
-        const videoStream = document.getElementById('videoStream');
+        const videoContainer = document.getElementById('video-container');
         const videoPlaceholder = document.getElementById('video-placeholder');
         const videoInfo = document.getElementById('video-info');
         const countOutput = document.getElementById('count-output');
         const ratioOutput = document.getElementById('ratio-output');
         const errorMessage = document.getElementById('error-message');
+        let currentVideoStream = null; // 현재 표시 중인 비디오 스트림 요소
 
         // 숫자만 추출하는 함수
         function extractNumber(text) {
@@ -163,16 +164,33 @@
             const fileName = selectedOption.textContent.trim();
 
             if (videoURL) {
-                // 비디오 스트림 소스 업데이트
-                videoStream.src = videoURL;
-                videoStream.style.display = 'block';
+                // 기존 비디오 스트림이 있으면 제거
+                if (currentVideoStream) {
+                    currentVideoStream.remove();
+                    currentVideoStream = null;
+                }
+
+                // 새 img 태그 생성
+                const newVideoStream = document.createElement('img');
+                newVideoStream.id = 'videoStream';
+                newVideoStream.className = 'video-feed';
+                newVideoStream.src = videoURL;
+                newVideoStream.alt = 'Video Stream';
+                
+                // 컨테이너에 추가
+                videoContainer.appendChild(newVideoStream);
+                currentVideoStream = newVideoStream;
+                
+                // 플레이스홀더 숨기기
                 videoPlaceholder.style.display = 'none';
                 videoInfo.textContent = `재생 중: ${fileName}`;
                 videoInfo.style.display = 'block';
             } else {
                 // 아무것도 선택하지 않았을 경우 초기화
-                videoStream.src = "";
-                videoStream.style.display = 'none';
+                if (currentVideoStream) {
+                    currentVideoStream.remove();
+                    currentVideoStream = null;
+                }
                 videoPlaceholder.style.display = 'flex';
                 videoInfo.style.display = 'none';
             }
