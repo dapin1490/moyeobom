@@ -83,9 +83,6 @@ moyeobom/
 │   ├── images/                # 이미지 파일
 │   ├── videos/                # 비디오 파일 (분석 대상)
 │   └── fonts/                 # 폰트 파일
-├── django/                     # Django 프로젝트 (현재 미사용)
-│   └── moyeobom/
-│       └── peoplecounter/     # Django 앱 (Flask로 마이그레이션됨)
 └── README.md                   # 프로젝트 문서
 ```
 
