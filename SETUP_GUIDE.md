@@ -1,6 +1,6 @@
 # 모여봄 설치 및 실행 가이드
 
-> 💡 **이 가이드는 비-엔지니어를 위한 설치 및 실행 매뉴얼입니다.**
+> 💡 **이 가이드는 개발자가 아닌 사용자를 위한 설치 및 실행 매뉴얼입니다.**
 >
 > 기술적인 세부사항이 필요하시면 [README.md](README.md)를 참고해주세요.
 
@@ -15,6 +15,7 @@
 - [ ] **웹캠이 연결되어 있나요?** (실시간 분석을 위해 필요합니다)
 - [ ] **인터넷 연결이 가능한가요?** (첫 실행 시 모델 파일 다운로드에 필요합니다)
 - [ ] **프로젝트 폴더 경로를 알고 있나요?** (예: `C:\Users\...\moyeobom`)
+- [ ] **GPU가 있는 PC인가요?** (있으면 성능이 훨씬 좋습니다! 아래 GPU 확인 방법 참고)
 
 ---
 
@@ -69,7 +70,24 @@ python --version
 2. 설치 시 **"Add Python to PATH"** 옵션을 반드시 체크하세요
 3. 설치 완료 후 터미널을 다시 열고 위 명령어로 확인
 
-### Step 2: Anaconda 설치 (선택사항이지만 권장)
+### Step 2: GPU 확인 (권장)
+
+**GPU가 있으면 프로그램이 훨씬 빠르게 실행됩니다!** 특히 실시간으로 여러 명을 분석할 때 차이가 큽니다.
+
+**GPU 확인 방법:**
+
+**Windows:**
+1. 작업 관리자 열기 (`Ctrl + Shift + Esc`)
+2. "성능" 탭 클릭
+3. 왼쪽에서 "GPU" 항목이 보이면 GPU가 있는 것입니다
+4. 또는 `Win + R` → `dxdiag` 입력 → "표시" 탭에서 GPU 정보 확인
+
+**Mac:**
+- Mac은 일반적으로 GPU가 내장되어 있습니다 (M1/M2/M3 칩 또는 Intel Mac)
+
+> 💡 **참고:** GPU가 없어도 프로그램은 정상 작동합니다. 다만 처리 속도가 느릴 수 있습니다.
+
+### Step 3: Anaconda 설치 (선택사항이지만 권장)
 
 **Anaconda가 있는 경우:**
 ```bash
@@ -79,11 +97,30 @@ conda activate moyeobom
 
 **Anaconda가 없는 경우:**
 - [Anaconda 공식 웹사이트](https://www.anaconda.com/download)에서 다운로드
-- 또는 Step 3로 바로 진행해도 됩니다 (가상환경 없이 사용)
+- 또는 Step 4로 바로 진행해도 됩니다 (가상환경 없이 사용)
 
-### Step 3: 필요한 프로그램 설치
+### Step 4: 필요한 프로그램 설치
 
 프로젝트 폴더에서 다음 명령어 중 하나를 실행하세요:
+
+#### 🚀 GPU가 있는 경우 (권장)
+
+**GPU 버전으로 설치하면 훨씬 빠릅니다!**
+
+먼저 GPU 버전 PyTorch를 설치하세요:
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+그 다음 나머지 패키지를 설치하세요:
+```bash
+pip install -r requirements.txt
+```
+
+> 💡 **참고:** 위 명령어는 NVIDIA GPU (CUDA 12.1)용입니다.  
+> 다른 GPU를 사용하거나 오류가 발생하면 아래 "[GPU 버전 설치 오류 또는 GPU를 사용하지 못함](#문제-7-gpu-버전-설치-오류-또는-gpu를-사용하지-못함)" 섹션을 참고하세요.
+
+#### 💻 GPU가 없거나 일반 버전 설치
 
 **방법 1: requirements.txt 사용 (권장)**
 ```bash
@@ -96,9 +133,10 @@ pip install ultralytics flask norfair opencv-python numpy torch
 ```
 
 > 💡 **팁:** `requirements.txt` 파일이 있다면 방법 1을 사용하는 것이 더 쉽고 안전합니다.  
-> ⏱️ **시간이 걸릴 수 있습니다** (5-10분 정도, 인터넷 속도에 따라 다름)
+> ⏱️ **시간이 걸릴 수 있습니다** (5-10분 정도, 인터넷 속도에 따라 다름)  
+> ⚠️ **주의:** GPU가 있어도 일반 버전을 설치하면 GPU를 사용하지 못합니다. 가능하면 GPU 버전을 설치하세요!
 
-### Step 4: 실행
+### Step 5: 실행
 
 ```bash
 python app.py
@@ -188,6 +226,40 @@ pip install ultralytics flask norfair opencv-python numpy torch
 2. 인터넷 연결을 확인하세요
 3. 다운로드가 완료될 때까지 기다리세요
 
+### 문제 7: GPU 버전 설치 오류 또는 GPU를 사용하지 못함
+
+**원인:** GPU 드라이버가 설치되지 않았거나, 잘못된 CUDA 버전 설치
+
+**해결 방법:**
+
+**1단계: GPU 드라이버 확인**
+- NVIDIA GPU인 경우: [NVIDIA 드라이버 다운로드](https://www.nvidia.com/Download/index.aspx)에서 최신 드라이버 설치
+- 드라이버 설치 후 컴퓨터 재시작
+
+**2단계: CUDA 버전 확인**
+- NVIDIA 제어판에서 CUDA 버전 확인
+- 또는 터미널에서 `nvidia-smi` 명령어로 확인
+
+**3단계: 올바른 CUDA 버전으로 재설치**
+- CUDA 11.8인 경우:
+    ```bash
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    ```
+- CUDA 12.1인 경우:
+    ```bash
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    ```
+- CUDA 버전을 모르는 경우, 일반 버전으로 설치해도 작동합니다:
+    ```bash
+    pip install torch torchvision torchaudio
+    ```
+
+**4단계: GPU 사용 확인**
+- 프로그램 실행 후 터미널 메시지에서 GPU 사용 여부 확인
+- 또는 작업 관리자에서 GPU 사용률 확인
+
+> 💡 **팁:** GPU 설치가 복잡하면 일반 버전으로 설치해도 프로그램은 정상 작동합니다. 다만 속도가 느릴 수 있습니다.
+
 ---
 
 ## 🎨 전시 전 체크리스트
@@ -198,6 +270,8 @@ pip install ultralytics flask norfair opencv-python numpy torch
 - [ ] 웹캠이 제대로 연결되어 있고 작동하는가?
 - [ ] 컴퓨터가 전시 기간 동안 켜져 있을 수 있는가?
 - [ ] 전원이 안정적으로 공급되는가?
+- [ ] GPU가 있는 PC인가? (있으면 성능이 훨씬 좋습니다)
+- [ ] GPU 버전으로 설치했는가? (GPU가 있는 경우)
 
 ### 소프트웨어 확인
 - [ ] 프로그램이 정상적으로 실행되는가?
@@ -316,6 +390,15 @@ pip install ultralytics flask norfair opencv-python numpy torch
 3. 웹캠 연결을 확인하세요
 4. 미리 연락처를 확인해두고 기술 지원자에게 연락하세요
 
+### Q8: GPU가 없어도 사용할 수 있나요?
+**A:** 네, GPU가 없어도 프로그램은 정상 작동합니다. 다만 처리 속도가 느릴 수 있으므로, 가능하면 GPU가 있는 PC를 사용하는 것을 권장합니다.
+
+### Q9: GPU 버전과 일반 버전의 차이는 무엇인가요?
+**A:** GPU 버전은 딥러닝 모델을 GPU에서 실행하여 처리 속도가 훨씬 빠릅니다. 일반 버전은 CPU만 사용하므로 느릴 수 있습니다. 전시 환경에서는 GPU 버전을 사용하는 것이 좋습니다.
+
+### Q10: GPU 버전 설치가 실패했어요. 어떻게 하나요?
+**A:** GPU 버전 설치가 실패하거나 복잡하면 일반 버전으로 설치해도 됩니다. `pip install -r requirements.txt` 명령어로 설치하면 자동으로 일반 버전이 설치됩니다. 프로그램은 정상 작동하지만 속도가 느릴 수 있습니다.
+
 ---
 
 ## 📞 도움이 필요하신가요?
@@ -329,10 +412,20 @@ pip install ultralytics flask norfair opencv-python numpy torch
 
 ## 🎯 요약: 가장 빠른 실행 방법
 
+### GPU가 있는 경우 (권장)
 1. 터미널 열기
 2. 프로젝트 폴더로 이동: `cd [프로젝트 경로]`
-3. 실행: `python app.py`
-4. 브라우저에서 [http://localhost:5000](http://localhost:5000) 접속
+3. GPU 버전 설치: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121`
+4. 나머지 패키지 설치: `pip install -r requirements.txt`
+5. 실행: `python app.py`
+6. 브라우저에서 [http://localhost:5000](http://localhost:5000) 접속
+
+### GPU가 없는 경우
+1. 터미널 열기
+2. 프로젝트 폴더로 이동: `cd [프로젝트 경로]`
+3. 패키지 설치: `pip install -r requirements.txt`
+4. 실행: `python app.py`
+5. 브라우저에서 [http://localhost:5000](http://localhost:5000) 접속
 
 끝! 🎉
 
