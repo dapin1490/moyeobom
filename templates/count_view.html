@@ -15,12 +15,12 @@
             flex-wrap: wrap;
             margin: var(--spacing-xl) 0;
         }
-        
+
         .count-card {
             min-width: 200px;
             text-align: center;
         }
-        
+
         .count-number {
             font-size: 3rem;
             font-weight: var(--font-weight-bold);
@@ -28,11 +28,11 @@
             transition: all var(--transition-base);
             line-height: 1.2;
         }
-        
+
         .count-number.updated {
             animation: pulse 0.5s ease;
         }
-        
+
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
@@ -41,45 +41,45 @@
                 transform: scale(1.1);
             }
         }
-        
+
         .direction-card {
             min-width: 200px;
             text-align: center;
         }
-        
+
         .direction-icon {
             font-size: 2.5rem;
             margin-bottom: var(--spacing-sm);
             display: inline-block;
             transition: all var(--transition-base);
         }
-        
+
         .direction-icon.updated {
             animation: pulse 0.5s ease;
         }
-        
+
         .direction-name {
             font-size: var(--font-size-lg);
             font-weight: var(--font-weight-semibold);
             color: var(--color-text-primary);
             margin-bottom: var(--spacing-xs);
         }
-        
+
         .direction-count {
             font-size: var(--font-size-base);
             color: var(--color-text-secondary);
         }
-        
+
         .direction-left { color: var(--color-primary); }
         .direction-right { color: var(--color-success); }
         .direction-up { color: var(--color-warning); }
         .direction-down { color: var(--color-danger); }
-        
+
         .video-container {
             max-width: 800px;
             margin: var(--spacing-xl) auto;
         }
-        
+
         .error-message {
             background-color: var(--color-danger);
             color: var(--color-text-white);
@@ -110,7 +110,7 @@
                         실시간 업데이트 중...
                     </div>
                 </div>
-                
+
                 <div class="direction-card card">
                     <div class="data-label">주요 이동 방향</div>
                     <div id="direction-icon" class="direction-icon">
@@ -203,7 +203,7 @@
             }
 
             const directionInfo = directionMap[direction];
-            
+
             // 이전 방향과 다르면 애니메이션
             if (previousDirection !== direction) {
                 animateCounter(directionIcon);
@@ -234,7 +234,7 @@
                 } else {
                     const message = data.message;
                     const parsed = parseMovementInfo(message);
-                    
+
                     // 사람 수 업데이트
                     if (parsed.peopleCount !== null) {
                         // 이전 값과 다르면 애니메이션
@@ -242,7 +242,7 @@
                             animateCounter(countOutput);
                         }
                         previousCount = parsed.peopleCount;
-                        
+
                         countOutput.textContent = parsed.peopleCount;
                         countOutput.style.color = parsed.peopleCount > 0 ? 'var(--color-primary)' : 'var(--color-text-muted)';
                     } else {
@@ -274,7 +274,7 @@
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
         setInterval(fetchCountData, 1000); // 1초마다 호출
-        
+
         // 페이지 로드 시 즉시 데이터 가져오기
         fetchCountData();
     </script>

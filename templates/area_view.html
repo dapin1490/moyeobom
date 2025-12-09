@@ -12,11 +12,11 @@
             max-width: 600px;
             margin: var(--spacing-xl) auto;
         }
-        
+
         .ratio-card {
             margin-bottom: var(--spacing-lg);
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: var(--spacing-xs) var(--spacing-md);
@@ -25,27 +25,27 @@
             font-weight: var(--font-weight-semibold);
             margin-top: var(--spacing-sm);
         }
-        
+
         .status-free {
             background-color: rgba(20, 209, 0, 0.1);
             color: var(--color-status-free);
         }
-        
+
         .status-normal {
             background-color: rgba(255, 221, 0, 0.1);
             color: var(--color-status-normal);
         }
-        
+
         .status-crowded {
             background-color: rgba(255, 99, 130, 0.1);
             color: var(--color-status-crowded);
         }
-        
+
         .video-container {
             max-width: 800px;
             margin: var(--spacing-xl) auto;
         }
-        
+
         .error-message {
             background-color: var(--color-danger);
             color: var(--color-text-white);
@@ -53,11 +53,11 @@
             border-radius: var(--border-radius-md);
             margin: var(--spacing-md) 0;
         }
-        
+
         .progress-bar-inner.updated {
             animation: progressUpdate 0.5s ease;
         }
-        
+
         @keyframes progressUpdate {
             0% {
                 transform: scaleX(0.95);
@@ -99,7 +99,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- 상태 배지 -->
                         <div id="status-badge" class="status-badge" style="display: none;">
                             <span class="skeleton" style="display: inline-block; width: 60px; height: 24px; border-radius: var(--border-radius-full);"></span>
@@ -150,18 +150,18 @@
         // 메시지에서 상태 추출
         function parseStatus(message) {
             if (!message) return null;
-            
+
             // "Person Area Ratio: 여유" 형식에서 상태 추출
             const match = message.match(/Person Area Ratio:\s*(여유|보통|혼잡)/);
             if (match) {
                 return match[1];
             }
-            
+
             // 직접 상태 텍스트인 경우
             if (message.includes('여유')) return '여유';
             if (message.includes('보통')) return '보통';
             if (message.includes('혼잡')) return '혼잡';
-            
+
             return null;
         }
 
@@ -177,7 +177,7 @@
             }
 
             const config = statusConfig[status];
-            
+
             // 이전 상태와 다르면 애니메이션
             if (previousStatus !== status) {
                 ratioOutputInner.classList.add('updated');
@@ -225,7 +225,7 @@
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
         setInterval(fetchRatioData, 1000); // 1초마다 호출
-        
+
         // 페이지 로드 시 즉시 데이터 가져오기
         fetchRatioData();
     </script>

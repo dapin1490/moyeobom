@@ -38,14 +38,27 @@
 
 2. **필수 패키지 설치**
   ```bash
+  pip install -r requirements.txt
+  ```
+
+  또는 개별 패키지 설치:
+  ```bash
   pip install ultralytics flask norfair opencv-python numpy torch
   ```
 
 3. **GPU 지원 (선택사항)**
-  GPU가 있는 경우 PyTorch GPU 버전 설치:
+  GPU가 있는 경우 PyTorch GPU 버전을 먼저 설치한 후 나머지 패키지를 설치하세요:
   ```bash
+  # CUDA 12.1용 (대부분의 최신 GPU)
+  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+  # 또는 CUDA 11.8용
   pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 --index-url https://download.pytorch.org/whl/cu118
+
+  # 그 다음 나머지 패키지 설치
+  pip install -r requirements.txt
   ```
+
+  > 💡 **참고:** GPU 설치에 대한 자세한 내용은 [SETUP_GUIDE.md](SETUP_GUIDE.md)를 참고하세요.
 
 ## 실행 방법
 
@@ -71,6 +84,8 @@
 ```
 moyeobom/
 ├── app.py                      # Flask 메인 애플리케이션
+├── config.json                 # 설정 파일 (서버, 카메라, 모델, 추적기, 혼잡도 설정)
+├── requirements.txt            # 필수 패키지 목록
 ├── templates/                  # HTML 템플릿
 │   ├── index.html             # 메인 페이지
 │   ├── count_view.html        # 사람 수 카운팅 뷰
@@ -128,26 +143,64 @@ moyeobom/
 
 ## 설정
 
-### 혼잡도 임계값 조정
-`app.py` 파일에서 `complex_ratio` 변수를 수정하여 혼잡도 기준을 변경할 수 있습니다:
+프로젝트의 모든 설정은 `config.json` 파일에서 관리됩니다. 코드를 수정할 필요 없이 설정 파일만 변경하면 됩니다.
 
-```python
-complex_ratio = [30, 70]  # [여유-보통 경계, 보통-혼잡 경계]
+### 설정 파일 구조
+`config.json` 파일에는 다음 설정들이 포함되어 있습니다:
+
+- **서버 설정**: 호스트, 포트, 디버그 모드
+- **카메라 설정**: 웹캠 인덱스
+- **모델 설정**: YOLO 모델 파일 경로
+- **추적기 설정**: 거리 함수 및 임계값
+- **혼잡도 설정**: 여유/보통/혼잡 기준 비율
+
+### 주요 설정 변경 방법
+
+#### 혼잡도 임계값 조정
+`config.json` 파일에서 `complex_ratio` 값을 수정하세요:
+
+```json
+"complex_ratio": {
+  "low_threshold": 30,
+  "high_threshold": 70
+}
 ```
 
-### 웹캠 설정
-기본 웹캠 인덱스는 0번입니다. 다른 웹캠을 사용하려면 `app.py`의 다음 부분을 수정하세요:
+#### 웹캠 변경
+여러 개의 웹캠이 연결되어 있을 때 다른 웹캠을 사용하려면:
 
-```python
-cap = cv2.VideoCapture(0)  # 웹캠 인덱스 변경
+```json
+"camera": {
+  "index": 0
+}
 ```
 
-### 추적기 설정
-Norfair 추적기의 거리 임계값을 조정하려면:
+`"index": 0`을 `"index": 1` 또는 `"index": 2` 등으로 변경하세요.
 
-```python
-tracker = Tracker(distance_function="euclidean", distance_threshold=120)
+#### 추적기 민감도 조정
+객체 추적이 너무 민감하거나 둔감할 때:
+
+```json
+"tracker": {
+  "distance_threshold": 120
+}
 ```
+
+- 값이 클수록: 더 멀리 있는 객체도 같은 객체로 인식 (더 민감)
+- 값이 작을수록: 가까운 객체만 같은 객체로 인식 (덜 민감)
+
+#### 포트 번호 변경
+다른 프로그램과 포트가 충돌할 때:
+
+```json
+"server": {
+  "port": 5000
+}
+```
+
+`"port": 5000`을 다른 번호로 변경하세요 (예: `"port": 5001`).
+
+> ⚠️ **주의:** `config.json` 파일을 수정한 후에는 프로그램을 다시 시작해야 합니다.
 
 ## 주의사항
 

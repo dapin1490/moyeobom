@@ -11,7 +11,7 @@
   --color-status-free: rgba(20, 209, 0, 1);      /* 여유 - 초록 */
   --color-status-normal: rgba(255, 221, 0, 1);    /* 보통 - 노랑 */
   --color-status-crowded: rgba(255, 99, 130, 1);  /* 혼잡 - 빨강 */
-  
+
   /* 기본 색상 */
   --color-primary: rgba(0, 123, 255, 1);          /* Primary Blue */
   --color-primary-hover: rgba(0, 105, 217, 1);
@@ -19,31 +19,31 @@
   --color-success: var(--color-status-free);
   --color-warning: var(--color-status-normal);
   --color-danger: var(--color-status-crowded);
-  
+
   /* 배경 색상 */
   --color-bg-primary: rgba(252, 252, 255, 1);     /* 메인 배경 */
   --color-bg-white: rgba(255, 255, 255, 1);
   --color-bg-light: rgba(238, 239, 245, 1);
   --color-bg-overlay: rgba(0, 0, 0, 0.3);
-  
+
   /* 텍스트 색상 */
   --color-text-primary: rgba(0, 0, 0, 1);
   --color-text-secondary: rgba(84, 84, 84, 1);
   --color-text-muted: rgba(145, 145, 150, 1);
   --color-text-light: rgba(0, 0, 0, 0.7);
   --color-text-white: rgba(255, 255, 255, 1);
-  
+
   /* 테두리 색상 */
   --color-border: rgba(239, 239, 255, 1);
   --color-border-light: rgba(238, 239, 245, 1);
-  
+
   /* 간격 */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
+
   /* 폰트 크기 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;
@@ -51,7 +51,7 @@
   --font-size-lg: 18px;
   --font-size-xl: 20px;
   --font-size-2xl: 24px;
-  
+
   /* 폰트 굵기 */
   --font-weight-light: 300;
   --font-weight-normal: 400;
@@ -59,18 +59,18 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
-  
+
   /* 둥근 모서리 */
   --border-radius-sm: 8px;
   --border-radius-md: 12px;
   --border-radius-lg: 16px;
   --border-radius-full: 50px;
-  
+
   /* 그림자 */
   --shadow-sm: 0px 1px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0px 2px 8px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0px 4px 16px rgba(0, 0, 0, 0.2);
-  
+
   /* 전환 효과 */
   --transition-fast: 0.15s ease;
   --transition-base: 0.3s ease;
@@ -598,21 +598,21 @@ body {
   .container {
     padding: 0 var(--spacing-sm);
   }
-  
+
   .page-title {
     font-size: var(--font-size-xl);
   }
-  
+
   .nav-container {
     flex-direction: column;
     gap: var(--spacing-xs);
   }
-  
+
   .nav-link {
     width: 100%;
     text-align: center;
   }
-  
+
   .card {
     padding: var(--spacing-md);
   }
