@@ -1,6 +1,6 @@
 # 모여봄 설치 및 실행 가이드
 
-> 💡 **이 가이드는 디자이너 및 비-엔지니어를 위한 설치 및 실행 매뉴얼입니다.**
+> 💡 **이 가이드는 비-엔지니어를 위한 설치 및 실행 매뉴얼입니다.**
 >
 > 기술적인 세부사항이 필요하시면 [README.md](README.md)를 참고해주세요.
 
@@ -105,11 +105,11 @@ python app.py
 
 | 페이지 | 주소 | 설명 |
 |--------|------|------|
-| **메인 페이지** | `http://localhost:5000` | 시작 페이지 |
-| **사람 수 카운팅** | `http://localhost:5000/count_view` | 실시간으로 사람 수를 세는 페이지 |
-| **혼잡도 분석** | `http://localhost:5000/area_view` | 혼잡도를 분석하는 페이지 |
-| **지도 뷰** | `http://localhost:5000/map_view` | 지도 화면 |
-| **비디오 분석** | `http://localhost:5000/video_view` | 저장된 비디오 파일 분석 |
+| **메인 페이지** | [http://localhost:5000](http://localhost:5000) | 시작 페이지 |
+| **사람 수 카운팅** | [http://localhost:5000/count_view](http://localhost:5000/count_view) | 실시간으로 사람 수를 세는 페이지 |
+| **혼잡도 분석** | [http://localhost:5000/area_view](http://localhost:5000/area_view) | 혼잡도를 분석하는 페이지 |
+| **지도 뷰** | [http://localhost:5000/map_view](http://localhost:5000/map_view) | 지도 화면 |
+| **비디오 분석** | [http://localhost:5000/video_view](http://localhost:5000/video_view) | 저장된 비디오 파일 분석 |
 
 ---
 
@@ -288,5 +288,6 @@ complex_ratio = [30, 70]
 ---
 
 **마지막 업데이트:** 2025년
+
 **문서 버전:** 1.0
 
