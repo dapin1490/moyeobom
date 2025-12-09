@@ -5,15 +5,18 @@ from flask import Flask, render_template, Response, jsonify, send_from_directory
 from ultralytics import YOLO
 from norfair import Detection, Tracker
 
-# 이전 위치 저장
-previous_positions = {}
-
-complex_ratio = [30, 70]
-
+# ============================================================================
+# 전역 변수
+# ============================================================================
+previous_positions = {}  # 이전 위치 저장
+complex_ratio = [30, 70]  # 혼잡도 기준 비율
 message_count = ""
 message_ratio = ""
 ratio_code = ''
 
+# ============================================================================
+# 유틸리티 함수
+# ============================================================================
 def calculate_direction(prev_pos, curr_pos):
     """두 점을 비교하여 이동 방향을 계산합니다."""
     dx = curr_pos[0] - prev_pos[0]
@@ -23,6 +26,10 @@ def calculate_direction(prev_pos, curr_pos):
     else:  # 수직 이동
         return "down" if dy > 0 else "up"
 
+
+# ============================================================================
+# 프레임 처리 함수
+# ============================================================================
 def process_frames():
     global previous_positions, message_count
 
@@ -85,6 +92,7 @@ def process_frames():
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
 
+
 def process_area_frames():
     global complex_ratio, message_ratio
     while True:
@@ -107,19 +115,19 @@ def process_area_frames():
 
         # 면적 비율 계산
         area_ratio = (total_person_area / frame_area) * 100
-        message_ratio = f"Person Area Ratio: "
         if area_ratio < complex_ratio[0]:
-            message_ratio += "여유"
+            message_ratio = "Person Area Ratio: 여유"
         elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
-            message_ratio += "보통"
+            message_ratio = "Person Area Ratio: 보통"
         else:
-            message_ratio += "혼잡"
+            message_ratio = "Person Area Ratio: 혼잡"
 
         # 프레임을 JPEG로 인코딩
         _, buffer = cv2.imencode(".jpg", frame)
         frame_bytes = buffer.tobytes()
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
+
 
 def process_cam_feed():
     while True:
@@ -133,6 +141,7 @@ def process_cam_feed():
         frame_bytes = buffer.tobytes()
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
+
 
 def detect_video(video_path):
     global previous_positions, message_count, complex_ratio, message_ratio
@@ -195,22 +204,25 @@ def detect_video(video_path):
 
             # 면적 비율 계산
             area_ratio = (total_person_area / frame_area) * 100
-            message_ratio = f"Person Area Ratio: "
             if area_ratio < complex_ratio[0]:
-                message_ratio += "여유"
+                message_ratio = "Person Area Ratio: 여유"
             elif complex_ratio[0] <= area_ratio < complex_ratio[1]:
-                message_ratio += "보통"
+                message_ratio = "Person Area Ratio: 보통"
             else:
-                message_ratio += "혼잡"
+                message_ratio = "Person Area Ratio: 혼잡"
 
             # 프레임을 JPEG로 인코딩
             _, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
 
             yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         cap.release()
 
+
+# ============================================================================
+# Flask 앱 초기화
+# ============================================================================
 app = Flask(__name__)
 
 # YOLO 모델 로드
@@ -222,46 +234,41 @@ tracker = Tracker(distance_function="euclidean", distance_threshold=120)
 # 웹캠 캡처
 cap = cv2.VideoCapture(0)
 
+
+# ============================================================================
+# Flask 라우트
+# ============================================================================
+
+# 템플릿 라우트
 @app.route('/static/fonts/<path:filename>')
 def custom_font(filename):
     return send_from_directory('static/fonts', filename)
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+
 @app.route("/count_view")
 def count_view():
     return render_template("count_view.html")
+
 
 @app.route("/area_view")
 def area_view():
     return render_template("area_view.html")
 
+
 @app.route("/map_view")
 def map_view():
     return render_template("map_view.html")
+
 
 @app.route("/map_view_info")
 def map_view_info():
     return render_template("map_view_info.html")
 
-@app.route("/video_feed")
-def video_feed():
-    return Response(process_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
-
-@app.route("/area_feed")
-def area_feed():
-    return Response(process_area_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
-
-@app.route("/cam_feed")
-def cam_feed():
-    return Response(process_cam_feed(), mimetype="multipart/x-mixed-replace; boundary=frame")
-
-@app.route('/video_feed/<video_name>')
-def video_view_feed(video_name):
-    video_path = f'static/videos/{video_name}'
-    return Response(detect_video(video_path), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_view')
 def video_page():
@@ -271,6 +278,29 @@ def video_page():
     video_files.remove('.placeholder')
     return render_template('video_view.html', video_files=video_files)
 
+
+# 비디오 피드 라우트
+@app.route("/video_feed")
+def video_feed():
+    return Response(process_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+@app.route("/area_feed")
+def area_feed():
+    return Response(process_area_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+@app.route("/cam_feed")
+def cam_feed():
+    return Response(process_cam_feed(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+@app.route('/video_feed/<video_name>')
+def video_view_feed(video_name):
+    video_path = f'static/videos/{video_name}'
+    return Response(detect_video(video_path), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# 데이터 API 라우트
 @app.route("/detection_data_feed")
 def process_area_data():
     global complex_ratio, ratio_code
@@ -282,7 +312,6 @@ def process_area_data():
 
         frame_area = frame.shape[0] * frame.shape[1]
         total_person_area = 0
-        # 사람 수
         people_count = 0
 
         # YOLO 탐지
@@ -292,10 +321,8 @@ def process_area_data():
         for result in results[0].boxes:
             if result.cls == 0:  # 사람 클래스
                 x1, y1, x2, y2 = map(int, result.xyxy[0])
-                # 혼잡도
                 person_area = (x2 - x1) * (y2 - y1)
                 total_person_area += person_area
-                # 입퇴장
                 people_count += 1
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
@@ -342,6 +369,7 @@ def process_area_data():
         }
         return jsonify(data)
 
+
 @app.route("/get_count_data")
 def get_count_data():
     global message_count
@@ -349,6 +377,7 @@ def get_count_data():
         "message": f"{message_count}"
     }
     return jsonify(text_data)
+
 
 @app.route("/get_ratio_data")
 def get_ratio_data():
@@ -358,6 +387,7 @@ def get_ratio_data():
     }
     return jsonify(text_data)
 
+
 @app.route("/get_ratio_code")
 def get_ratio_code():
     global ratio_code
@@ -366,5 +396,9 @@ def get_ratio_code():
     }
     return jsonify(text_data)
 
+
+# ============================================================================
+# 메인 실행
+# ============================================================================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
