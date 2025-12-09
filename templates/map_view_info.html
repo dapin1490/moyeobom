@@ -11,7 +11,15 @@
 </head>
 
 <body>
-    <div class="total_canvas">
+    <!-- 홈으로 돌아가기 상단 바 -->
+    <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(239, 239, 255, 1); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+        <a href="/" style="text-decoration: none; color: rgba(0, 0, 0, 1); font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <span>←</span>
+            <span>홈으로</span>
+        </a>
+        <span style="color: rgba(84, 84, 84, 1); font-size: 14px;">데모 맵 정보</span>
+    </div>
+    <div class="total_canvas" style="padding-top: 48px;">
         <div class="inside_canvas">
             <div class="inside_canvas_background"></div>
             <div class="timetables">
