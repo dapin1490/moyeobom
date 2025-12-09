@@ -1,108 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <title>Video Detection</title>
+    <title>Video Detection - 모여봄</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
+        .video-select-section {
+            max-width: 600px;
+            margin: var(--spacing-xl) auto;
         }
-        .video-feed {
-            border: 2px solid #000;
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
+        
+        .detection-data-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
         }
-        select#videoDropdown {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 400px;
+        
+        .data-card {
+            min-height: 120px;
+        }
+        
+        .video-container {
+            max-width: 800px;
+            margin: var(--spacing-xl) auto;
+        }
+        
+        .video-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background-color: var(--color-bg-light);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--border-radius-md);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-lg);
+        }
+        
+        .error-message {
+            background-color: var(--color-danger);
+            color: var(--color-text-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
+        }
+        
+        .video-info {
+            margin-top: var(--spacing-sm);
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
         }
     </style>
 </head>
 <body>
-    <h1>Video Detection</h1>
-    {% include '_nav.html' %}
-    <div>
-        <h3>Select a Video</h3>
-        <select id="videoDropdown">
-            <option value="">동영상을 선택하세요</option>
-            {% for video in video_files %}
-                <option value="/video_feed/{{ video }}">{{ video }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div>
-        <h3>Live Detection</h3>
-        <div id="count-output">Loading...</div>
-        <div id="ratio-output">Loading...</div>
-        <img id="videoStream" src="" alt="Video Stream" style="width: 393px;">
-    </div>
-    <script>
-        // 비디오 선택 재생
-        const videoDropdown = document.getElementById('videoDropdown'); // 드롭다운 메뉴
-        const videoStream = document.getElementById('videoStream'); // 비디오 스트림 요소
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Video Detection</h1>
+            <p class="page-subtitle">동영상 파일 분석</p>
+        </div>
 
+        {% include '_nav.html' %}
+
+        <main>
+            <!-- 비디오 선택 영역 -->
+            <div class="video-select-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">동영상 선택</h2>
+                        <p class="card-subtitle">분석할 동영상 파일을 선택하세요</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="videoDropdown" class="form-label">동영상 파일</label>
+                            <select id="videoDropdown" class="form-control form-select">
+                                <option value="">동영상을 선택하세요</option>
+                                {% for video in video_files %}
+                                    <option value="/video_feed/{{ video }}">{{ video }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="video-info" class="video-info" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탐지 데이터 표시 영역 -->
+            <div class="detection-data-wrapper">
+                <div class="data-card card">
+                    <div class="card-header">
+                        <h3 class="card-title" style="font-size: var(--font-size-base);">사람 수</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="count-output" class="data-display">
+                            <div class="data-label">탐지된 사람 수</div>
+                            <div class="data-value">
+                                <span class="skeleton" style="display: inline-block; width: 60px; height: 40px; border-radius: var(--border-radius-sm);"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-card card">
+                    <div class="card-header">
+                        <h3 class="card-title" style="font-size: var(--font-size-base);">영역 비율</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="ratio-output" class="data-display">
+                            <div class="data-label">혼잡도 상태</div>
+                            <div class="data-value">
+                                <span class="skeleton" style="display: inline-block; width: 60px; height: 40px; border-radius: var(--border-radius-sm);"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 에러 메시지 영역 (초기에는 숨김) -->
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <!-- 비디오 스트림 영역 -->
+            <div class="video-container">
+                <div id="video-placeholder" class="video-placeholder">
+                    동영상을 선택하면 여기에 표시됩니다
+                </div>
+                <img id="videoStream" class="video-feed" src="" alt="Video Stream" style="display: none;">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const videoDropdown = document.getElementById('videoDropdown');
+        const videoStream = document.getElementById('videoStream');
+        const videoPlaceholder = document.getElementById('video-placeholder');
+        const videoInfo = document.getElementById('video-info');
+        const countOutput = document.getElementById('count-output');
+        const ratioOutput = document.getElementById('ratio-output');
+        const errorMessage = document.getElementById('error-message');
+
+        // 숫자만 추출하는 함수
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        // 상태 파싱 함수
+        function parseStatus(message) {
+            if (!message) return null;
+            if (message.includes('여유')) return '여유';
+            if (message.includes('보통')) return '보통';
+            if (message.includes('혼잡')) return '혼잡';
+            return null;
+        }
+
+        // 비디오 선택 이벤트
         videoDropdown.addEventListener('change', () => {
-            const selectedOption = videoDropdown.options[videoDropdown.selectedIndex]; // 선택된 옵션
-            const videoURL = selectedOption.value; // 선택된 옵션의 값 (URL)
-            const fileName = selectedOption.textContent.trim(); // 선택된 옵션의 텍스트 (파일명)
+            const selectedOption = videoDropdown.options[videoDropdown.selectedIndex];
+            const videoURL = selectedOption.value;
+            const fileName = selectedOption.textContent.trim();
 
             if (videoURL) {
                 // 비디오 스트림 소스 업데이트
                 videoStream.src = videoURL;
+                videoStream.style.display = 'block';
+                videoPlaceholder.style.display = 'none';
+                videoInfo.textContent = `재생 중: ${fileName}`;
+                videoInfo.style.display = 'block';
             } else {
                 // 아무것도 선택하지 않았을 경우 초기화
                 videoStream.src = "";
+                videoStream.style.display = 'none';
+                videoPlaceholder.style.display = 'flex';
+                videoInfo.style.display = 'none';
             }
         });
 
-        // 비디오 탐지 결과 로드 및 적용
-        const count_output = document.getElementById("count-output");
-        const ratio_output = document.getElementById("ratio-output");
-
-        async function fetchDetectionData() {
-            try {
-                const response_count = await fetch("/get_count_data");
-                const data_count = await response_count.json();
-                // console.log(`count data: ${data_count.message}`);
-
-                if (data_count.error) {
-                    count_output.innerText = "Error: Unable to fetch data.";
-                } else {
-                    count_output.innerText = data_count.message;
-                }
-
-            } catch (error) {
-                console.error("Error fetching count data:", error);
+        // 사람 수 데이터 업데이트
+        function updateCountData(message) {
+            const dataValue = countOutput.querySelector('.data-value');
+            
+            if (!message) {
+                dataValue.innerHTML = '<span class="skeleton" style="display: inline-block; width: 60px; height: 40px; border-radius: var(--border-radius-sm);"></span>';
+                return;
             }
 
-            try {
-                const response_ratio = await fetch("/get_ratio_data");
-                const data_ratio = await response_ratio.json();
-                // console.log(`ratio data: ${data_ratio.message}`);
+            const count = extractNumber(message);
+            if (count !== null) {
+                dataValue.innerHTML = `<span style="font-size: 2rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">${count}</span><span style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-left: var(--spacing-xs);">명</span>`;
+            } else {
+                // 숫자가 없으면 원본 메시지 표시
+                dataValue.textContent = message.split('\n')[0] || message;
+            }
+        }
 
-                if (data_ratio.error) {
-                    ratio_output.innerText = "Error: Unable to fetch data.";
-                } else {
-                    ratio_output.innerText = data_ratio.message;
+        // 비율 데이터 업데이트
+        function updateRatioData(message) {
+            const dataValue = ratioOutput.querySelector('.data-value');
+            
+            if (!message) {
+                dataValue.innerHTML = '<span class="skeleton" style="display: inline-block; width: 60px; height: 40px; border-radius: var(--border-radius-sm);"></span>';
+                return;
+            }
+
+            const status = parseStatus(message);
+            if (status) {
+                let color = 'var(--color-text-primary)';
+                if (status === '여유') color = 'var(--color-status-free)';
+                else if (status === '보통') color = 'var(--color-status-normal)';
+                else if (status === '혼잡') color = 'var(--color-status-crowded)';
+                
+                dataValue.innerHTML = `<span style="font-size: 1.5rem; font-weight: var(--font-weight-bold); color: ${color};">${status}</span>`;
+            } else {
+                dataValue.textContent = message;
+            }
+        }
+
+        // 비디오 탐지 결과 로드 및 적용
+        async function fetchDetectionData() {
+            try {
+                errorMessage.style.display = 'none';
+
+                // 사람 수 데이터 가져오기
+                try {
+                    const response_count = await fetch("/get_count_data");
+                    const data_count = await response_count.json();
+
+                    if (data_count.error) {
+                        updateCountData(null);
+                    } else {
+                        updateCountData(data_count.message);
+                    }
+                } catch (error) {
+                    console.error("Error fetching count data:", error);
+                    updateCountData(null);
                 }
+
+                // 비율 데이터 가져오기
+                try {
+                    const response_ratio = await fetch("/get_ratio_data");
+                    const data_ratio = await response_ratio.json();
+
+                    if (data_ratio.error) {
+                        updateRatioData(null);
+                    } else {
+                        updateRatioData(data_ratio.message);
+                    }
+                } catch (error) {
+                    console.error("Error fetching ratio data:", error);
+                    updateRatioData(null);
+                }
+
             } catch (error) {
-                console.error("Error fetching ratio data:", error);
+                console.error("Error fetching detection data:", error);
+                errorMessage.textContent = "데이터를 가져오는 중 오류가 발생했습니다.";
+                errorMessage.style.display = 'block';
             }
         }
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
         setInterval(fetchDetectionData, 1000); // 1초마다 호출
+        
+        // 페이지 로드 시 즉시 데이터 가져오기
+        fetchDetectionData();
     </script>
 </body>
 </html>

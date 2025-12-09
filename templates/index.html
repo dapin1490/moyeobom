@@ -1,29 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <title>People Counter and Area Ratio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .video-feed {
-            border: 2px solid #000;
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
-        }
-    </style>
+    <title>모여봄 - People Counter and Area Ratio</title>
 </head>
 <body>
-    <h1>People Count Tracker and Area Ratio</h1>
-    {% include '_nav.html' %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">모여봄</h1>
+            <p class="page-subtitle">People Count Tracker and Area Ratio</p>
+        </div>
+
+        {% include '_nav.html' %}
+
+        <main style="margin-top: var(--spacing-xl);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-lg);">
+                <!-- People Counter 카드 -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h2 class="card-title">People Counter</h2>
+                        <p class="card-subtitle">실시간 사람 수 추적</p>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                            실시간 비디오 스트림에서 사람을 탐지하고 카운트합니다. 
+                            YOLO 모델을 사용하여 정확한 인원 수를 추적합니다.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/count_view" class="btn btn-primary">시작하기</a>
+                    </div>
+                </div>
+
+                <!-- Person Area Ratio 카드 -->
+                <div class="card fade-in" style="animation-delay: 0.1s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Person Area Ratio</h2>
+                        <p class="card-subtitle">영역별 인원 비율 분석</p>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                            특정 영역 내 사람들의 밀도를 분석하여 혼잡도를 계산합니다. 
+                            여유, 보통, 혼잡 상태를 시각적으로 표시합니다.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/area_view" class="btn btn-primary">시작하기</a>
+                    </div>
+                </div>
+
+                <!-- Video View 카드 -->
+                <div class="card fade-in" style="animation-delay: 0.2s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Video View</h2>
+                        <p class="card-subtitle">동영상 파일 분석</p>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                            저장된 동영상 파일을 선택하여 사람 탐지 및 카운팅을 수행합니다. 
+                            다양한 동영상 형식을 지원합니다.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/video_view" class="btn btn-primary">시작하기</a>
+                    </div>
+                </div>
+
+                <!-- Demo Map View 카드 -->
+                <div class="card fade-in" style="animation-delay: 0.3s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Demo Map View</h2>
+                        <p class="card-subtitle">데모 지도 뷰</p>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                            페스티벌 지도에서 각 구역의 혼잡도를 실시간으로 확인할 수 있습니다. 
+                            데모 버전으로 제공됩니다.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/map_view" class="btn btn-outline">데모 보기</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <script>
         async function fetchRatioData() {
             try {

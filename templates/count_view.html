@@ -1,49 +1,282 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <title>count view</title>
+    <title>People Counter - 모여봄</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
+        .count-display-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+            margin: var(--spacing-xl) 0;
         }
-        .video-feed {
-            border: 2px solid #000;
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
+        
+        .count-card {
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .count-number {
+            font-size: 3rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            transition: all var(--transition-base);
+            line-height: 1.2;
+        }
+        
+        .count-number.updated {
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        
+        .direction-card {
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .direction-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-sm);
+            display: inline-block;
+            transition: all var(--transition-base);
+        }
+        
+        .direction-icon.updated {
+            animation: pulse 0.5s ease;
+        }
+        
+        .direction-name {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .direction-count {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+        
+        .direction-left { color: var(--color-primary); }
+        .direction-right { color: var(--color-success); }
+        .direction-up { color: var(--color-warning); }
+        .direction-down { color: var(--color-danger); }
+        
+        .video-container {
+            max-width: 800px;
+            margin: var(--spacing-xl) auto;
+        }
+        
+        .error-message {
+            background-color: var(--color-danger);
+            color: var(--color-text-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
         }
     </style>
 </head>
 <body>
-    <h1>People Counter and Tracker</h1>
-    {% include '_nav.html' %}
-    <div id="count-output">Loading...</div>
-    <img id="live-feed" class="video-feed" src="/video_feed" alt="Live feed">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">People Counter and Tracker</h1>
+            <p class="page-subtitle">실시간 사람 수 추적</p>
+        </div>
+
+        {% include '_nav.html' %}
+
+        <main>
+            <!-- 카운트 데이터 표시 영역 -->
+            <div class="count-display-wrapper">
+                <div class="count-card card">
+                    <div class="data-label">탐지된 사람 수</div>
+                    <div id="count-output" class="count-number">
+                        <span class="skeleton" style="display: inline-block; width: 80px; height: 60px; border-radius: var(--border-radius-sm);"></span>
+                    </div>
+                    <div style="margin-top: var(--spacing-sm); color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        실시간 업데이트 중...
+                    </div>
+                </div>
+                
+                <div class="direction-card card">
+                    <div class="data-label">주요 이동 방향</div>
+                    <div id="direction-icon" class="direction-icon">
+                        <span class="skeleton" style="display: inline-block; width: 60px; height: 60px; border-radius: var(--border-radius-sm);"></span>
+                    </div>
+                    <div id="direction-name" class="direction-name">-</div>
+                    <div id="direction-count" class="direction-count">
+                        <span class="skeleton" style="display: inline-block; width: 100px; height: 20px; border-radius: var(--border-radius-sm);"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 에러 메시지 영역 (초기에는 숨김) -->
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <!-- 비디오 스트림 영역 -->
+            <div class="video-container">
+                <img id="live-feed" class="video-feed" src="/video_feed" alt="Live feed">
+            </div>
+        </main>
+    </div>
+
     <script>
+        let previousCount = null;
+        let previousDirection = null;
+        const countOutput = document.getElementById("count-output");
+        const directionIcon = document.getElementById("direction-icon");
+        const directionName = document.getElementById("direction-name");
+        const directionCount = document.getElementById("direction-count");
+        const errorMessage = document.getElementById("error-message");
+
+        // 방향별 아이콘 및 한글 이름 매핑
+        const directionMap = {
+            'left': { icon: '←', name: '왼쪽', class: 'direction-left' },
+            'right': { icon: '→', name: '오른쪽', class: 'direction-right' },
+            'up': { icon: '↑', name: '위쪽', class: 'direction-up' },
+            'down': { icon: '↓', name: '아래쪽', class: 'direction-down' }
+        };
+
+        // 숫자만 추출하는 함수
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        // 메시지에서 이동 방향 정보 파싱
+        function parseMovementInfo(message) {
+            // "People: {count}\nMost movement: {direction} ({count})" 형식 파싱
+            const lines = message.split('\n');
+            let peopleCount = null;
+            let movementDirection = null;
+            let movementCount = null;
+
+            // 첫 번째 줄에서 사람 수 추출
+            if (lines[0]) {
+                const peopleMatch = lines[0].match(/People:\s*(\d+)/i);
+                if (peopleMatch) {
+                    peopleCount = parseInt(peopleMatch[1]);
+                }
+            }
+
+            // 두 번째 줄에서 이동 방향 정보 추출
+            if (lines[1]) {
+                const movementMatch = lines[1].match(/Most movement:\s*(\w+)\s*\((\d+)\)/i);
+                if (movementMatch) {
+                    movementDirection = movementMatch[1].toLowerCase();
+                    movementCount = parseInt(movementMatch[2]);
+                }
+            }
+
+            return { peopleCount, movementDirection, movementCount };
+        }
+
+        // 카운터 애니메이션 함수
+        function animateCounter(element) {
+            element.classList.add('updated');
+            setTimeout(() => {
+                element.classList.remove('updated');
+            }, 500);
+        }
+
+        // 이동 방향 표시 업데이트
+        function updateDirection(direction, count) {
+            if (!direction || !directionMap[direction]) {
+                directionIcon.textContent = '-';
+                directionIcon.className = 'direction-icon';
+                directionName.textContent = '데이터 없음';
+                directionCount.textContent = '-';
+                return;
+            }
+
+            const directionInfo = directionMap[direction];
+            
+            // 이전 방향과 다르면 애니메이션
+            if (previousDirection !== direction) {
+                animateCounter(directionIcon);
+                previousDirection = direction;
+            }
+
+            directionIcon.textContent = directionInfo.icon;
+            directionIcon.className = `direction-icon ${directionInfo.class}`;
+            directionName.textContent = directionInfo.name;
+            directionCount.textContent = `${count}명 이동`;
+        }
+
         async function fetchCountData() {
             try {
                 const response = await fetch("/get_count_data");
                 const data = await response.json();
 
+                // 에러 메시지 숨기기
+                errorMessage.style.display = 'none';
+
                 if (data.error) {
-                    document.getElementById("count-output").innerText = "Error: Unable to fetch data.";
+                    countOutput.innerHTML = '<span style="color: var(--color-danger);">오류</span>';
+                    directionIcon.textContent = '-';
+                    directionName.textContent = '오류';
+                    directionCount.textContent = '-';
+                    errorMessage.textContent = "데이터를 가져올 수 없습니다.";
+                    errorMessage.style.display = 'block';
                 } else {
-                    document.getElementById("count-output").innerText = data.message;
+                    const message = data.message;
+                    const parsed = parseMovementInfo(message);
+                    
+                    // 사람 수 업데이트
+                    if (parsed.peopleCount !== null) {
+                        // 이전 값과 다르면 애니메이션
+                        if (previousCount !== null && previousCount !== parsed.peopleCount) {
+                            animateCounter(countOutput);
+                        }
+                        previousCount = parsed.peopleCount;
+                        
+                        countOutput.textContent = parsed.peopleCount;
+                        countOutput.style.color = parsed.peopleCount > 0 ? 'var(--color-primary)' : 'var(--color-text-muted)';
+                    } else {
+                        // 숫자가 없으면 원본 메시지 표시
+                        countOutput.textContent = message.split('\n')[0] || message;
+                        countOutput.style.color = 'var(--color-text-primary)';
+                    }
+
+                    // 이동 방향 업데이트
+                    if (parsed.movementDirection && parsed.movementCount !== null) {
+                        updateDirection(parsed.movementDirection, parsed.movementCount);
+                    } else {
+                        directionIcon.textContent = '-';
+                        directionIcon.className = 'direction-icon';
+                        directionName.textContent = '데이터 없음';
+                        directionCount.textContent = '-';
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching count data:", error);
+                countOutput.innerHTML = '<span style="color: var(--color-danger);">연결 오류</span>';
+                directionIcon.textContent = '-';
+                directionName.textContent = '연결 오류';
+                directionCount.textContent = '-';
+                errorMessage.textContent = "서버에 연결할 수 없습니다.";
+                errorMessage.style.display = 'block';
             }
         }
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
         setInterval(fetchCountData, 1000); // 1초마다 호출
+        
+        // 페이지 로드 시 즉시 데이터 가져오기
+        fetchCountData();
     </script>
 </body>
 </html>

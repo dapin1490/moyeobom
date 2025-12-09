@@ -1,49 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <title>area view</title>
+    <title>Person Area Ratio - 모여봄</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
+        .ratio-display-wrapper {
+            max-width: 600px;
+            margin: var(--spacing-xl) auto;
         }
-        .video-feed {
-            border: 2px solid #000;
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
+        
+        .ratio-card {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .status-free {
+            background-color: rgba(20, 209, 0, 0.1);
+            color: var(--color-status-free);
+        }
+        
+        .status-normal {
+            background-color: rgba(255, 221, 0, 0.1);
+            color: var(--color-status-normal);
+        }
+        
+        .status-crowded {
+            background-color: rgba(255, 99, 130, 0.1);
+            color: var(--color-status-crowded);
+        }
+        
+        .video-container {
+            max-width: 800px;
+            margin: var(--spacing-xl) auto;
+        }
+        
+        .error-message {
+            background-color: var(--color-danger);
+            color: var(--color-text-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
+        }
+        
+        .progress-bar-inner.updated {
+            animation: progressUpdate 0.5s ease;
+        }
+        
+        @keyframes progressUpdate {
+            0% {
+                transform: scaleX(0.95);
+            }
+            50% {
+                transform: scaleX(1.05);
+            }
+            100% {
+                transform: scaleX(1);
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Person Area Ratio</h1>
-    {% include '_nav.html' %}
-    <div id="ratio-output">Loading...</div>
-    <img id="area-feed" class="video-feed" src="/area_feed" alt="Area feed">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Person Area Ratio</h1>
+            <p class="page-subtitle">영역별 인원 비율 분석</p>
+        </div>
+
+        {% include '_nav.html' %}
+
+        <main>
+            <!-- 비율 데이터 표시 영역 -->
+            <div class="ratio-display-wrapper">
+                <div class="ratio-card card">
+                    <div class="card-header">
+                        <h2 class="card-title">혼잡도 상태</h2>
+                        <p class="card-subtitle">실시간 영역 비율 분석</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- 프로그레스 바 -->
+                        <div class="progress-container">
+                            <div id="ratio-output" class="progress-bar">
+                                <div id="ratio-output-inner" class="progress-bar-inner">
+                                    <span id="ratio-output-label" class="progress-label">
+                                        <span class="skeleton" style="display: inline-block; width: 40px; height: 16px; border-radius: var(--border-radius-sm);"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 상태 배지 -->
+                        <div id="status-badge" class="status-badge" style="display: none;">
+                            <span class="skeleton" style="display: inline-block; width: 60px; height: 24px; border-radius: var(--border-radius-full);"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 에러 메시지 영역 (초기에는 숨김) -->
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <!-- 비디오 스트림 영역 -->
+            <div class="video-container">
+                <img id="area-feed" class="video-feed" src="/area_feed" alt="Area feed">
+            </div>
+        </main>
+    </div>
+
     <script>
+        let previousStatus = null;
+        const ratioOutputInner = document.getElementById("ratio-output-inner");
+        const ratioOutputLabel = document.getElementById("ratio-output-label");
+        const statusBadge = document.getElementById("status-badge");
+        const errorMessage = document.getElementById("error-message");
+
+        // 상태별 설정
+        const statusConfig = {
+            '여유': {
+                percentage: 33,
+                color: 'var(--color-status-free)',
+                class: 'status-free',
+                text: '여유'
+            },
+            '보통': {
+                percentage: 66,
+                color: 'var(--color-status-normal)',
+                class: 'status-normal',
+                text: '보통'
+            },
+            '혼잡': {
+                percentage: 100,
+                color: 'var(--color-status-crowded)',
+                class: 'status-crowded',
+                text: '혼잡'
+            }
+        };
+
+        // 메시지에서 상태 추출
+        function parseStatus(message) {
+            if (!message) return null;
+            
+            // "Person Area Ratio: 여유" 형식에서 상태 추출
+            const match = message.match(/Person Area Ratio:\s*(여유|보통|혼잡)/);
+            if (match) {
+                return match[1];
+            }
+            
+            // 직접 상태 텍스트인 경우
+            if (message.includes('여유')) return '여유';
+            if (message.includes('보통')) return '보통';
+            if (message.includes('혼잡')) return '혼잡';
+            
+            return null;
+        }
+
+        // 상태 업데이트
+        function updateStatus(status) {
+            if (!status || !statusConfig[status]) {
+                // 데이터 없음 상태
+                ratioOutputInner.style.width = '0%';
+                ratioOutputInner.style.backgroundColor = 'var(--color-bg-light)';
+                ratioOutputLabel.textContent = '-';
+                statusBadge.style.display = 'none';
+                return;
+            }
+
+            const config = statusConfig[status];
+            
+            // 이전 상태와 다르면 애니메이션
+            if (previousStatus !== status) {
+                ratioOutputInner.classList.add('updated');
+                setTimeout(() => {
+                    ratioOutputInner.classList.remove('updated');
+                }, 500);
+                previousStatus = status;
+            }
+
+            // 프로그레스 바 업데이트
+            ratioOutputInner.style.width = config.percentage + '%';
+            ratioOutputInner.style.backgroundColor = config.color;
+            ratioOutputLabel.textContent = config.text;
+
+            // 상태 배지 업데이트
+            statusBadge.textContent = config.text;
+            statusBadge.className = `status-badge ${config.class}`;
+            statusBadge.style.display = 'inline-block';
+        }
+
         async function fetchRatioData() {
             try {
                 const response = await fetch("/get_ratio_data");
                 const data = await response.json();
 
+                // 에러 메시지 숨기기
+                errorMessage.style.display = 'none';
+
                 if (data.error) {
-                    document.getElementById("ratio-output").innerText = "Error: Unable to fetch data.";
+                    updateStatus(null);
+                    errorMessage.textContent = "데이터를 가져올 수 없습니다.";
+                    errorMessage.style.display = 'block';
                 } else {
-                    document.getElementById("ratio-output").innerText = data.message;
+                    const message = data.message;
+                    const status = parseStatus(message);
+                    updateStatus(status);
                 }
             } catch (error) {
                 console.error("Error fetching ratio data:", error);
+                updateStatus(null);
+                errorMessage.textContent = "서버에 연결할 수 없습니다.";
+                errorMessage.style.display = 'block';
             }
         }
 
         // 주기적으로 서버에서 텍스트 데이터 가져오기
         setInterval(fetchRatioData, 1000); // 1초마다 호출
+        
+        // 페이지 로드 시 즉시 데이터 가져오기
+        fetchRatioData();
     </script>
 </body>
 </html>
